@@ -1,0 +1,23 @@
+name: "AI Label Assistant"
+description: "Automatically label PRs and issues using AI"
+author: "Your Name"
+
+inputs:
+  github-token:
+    description: "GitHub token with repository access"
+    required: true
+  controlflow-model:
+    description: "ControlFlow model to use for AI processing"
+    required: true
+    default: "openai/gpt-4o-mini"
+  openai-api-key:
+    description: "OpenAI API key for AI processing"
+    required: true
+  dry-run:
+    description: "If true, will only suggest labels without applying them"
+    required: false
+    default: "false"
+
+runs:
+  using: "docker"
+  image: "Dockerfile"
