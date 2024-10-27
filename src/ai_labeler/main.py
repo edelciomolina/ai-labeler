@@ -77,19 +77,14 @@ def labeling_workflow(
 def main() -> None:
     # Set up GitHub client
     gh = Github(os.getenv("INPUT_GITHUB-TOKEN"))
-
-    # Configure ControlFlow
-    os.environ["OPENAI_API_KEY"] = os.getenv("INPUT_OPENAI-API-KEY")
-    cf.defaults.model = os.getenv("INPUT_CONTROLFLOW-MODEL", "openai/gpt-4o-mini")
+    repo = gh.get_repo(os.getenv("GITHUB_REPOSITORY"))
+    number = int(os.getenv("GITHUB_EVENT_NUMBER"))
+    event_type = os.getenv("GITHUB_EVENT_TYPE")
 
     # Get available labels
     available_labels = get_available_labels(gh)
 
-    # Determine if we're handling a PR or issue
-    event_type = os.getenv("GITHUB_EVENT_NAME")
-    repo = gh.get_repo(os.getenv("GITHUB_REPOSITORY"))
-    number = int(os.getenv("GITHUB_EVENT_NUMBER"))
-
+    # Get the item (PR or issue)
     if event_type == "pull_request":
         pr = repo.get_pull(number)
         item = PullRequest(

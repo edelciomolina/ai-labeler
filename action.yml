@@ -6,10 +6,10 @@ inputs:
   github-token:
     description: "GitHub token with repository access"
     required: true
-  controlflow-model:
+  controlflow-llm-model:
     description: "ControlFlow model to use for AI processing"
     required: true
-    default: "openai/gpt-4o-mini"
+    default: "openai/gpt-4-turbo"
   openai-api-key:
     description: "OpenAI API key for AI processing"
     required: true
@@ -21,3 +21,8 @@ inputs:
 runs:
   using: "docker"
   image: "Dockerfile"
+  env:
+    GITHUB_EVENT_NUMBER: ${{ github.event.number }}
+    GITHUB_EVENT_TYPE: ${{ github.event_name }}
+    OPENAI_API_KEY: ${{ inputs.openai-api-key }}
+    CONTROLFLOW_LLM_MODEL: ${{ inputs.controlflow-llm-model }}
