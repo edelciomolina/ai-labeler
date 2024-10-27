@@ -38,13 +38,19 @@ def apply_labels(gh_client: Github, labels: list[str]) -> None:
         print(f"Dry run: Would apply labels {labels} to #{number}")
         return
 
-    item = repo.get_issue(number)  # works for both PRs and issues
+    item = repo.get_issue(number)
     item.add_to_labels(*labels)
 
 
 def get_event_number() -> int:
     """Get the PR/Issue number from context or input"""
-    # Try GitHub event context first
+
+    # Use input if provided
+    input_number = os.getenv("INPUT_EVENT-NUMBER")
+    if input_number:
+        return int(input_number)
+
+    # Use GitHub event context
     event_path = os.getenv("GITHUB_EVENT_PATH")
     if event_path:
         with open(event_path) as f:
@@ -54,10 +60,5 @@ def get_event_number() -> int:
                 or event.get("pull_request", {}).get("number")
                 or event.get("issue", {}).get("number")
             )
-
-    # Fall back to input if provided
-    input_number = os.getenv("INPUT_EVENT-NUMBER")
-    if input_number:
-        return int(input_number)
 
     raise ValueError("Could not find PR/Issue number")

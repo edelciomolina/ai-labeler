@@ -1,24 +1,21 @@
-name: "AI Label Assistant"
+name: "AI Labeler"
 description: "Automatically label PRs and issues using AI"
-author: "Your Name"
+author: "Jeremiah Lowin"
 
 inputs:
-  github-token:
-    description: "GitHub token with repository access"
-    required: true
-    default: ${{ secrets.GITHUB_TOKEN }}
   controlflow-llm-model:
-    description: "ControlFlow model to use for AI processing"
+    description: "ControlFlow model to use for AI labeling. Should be openai/<model-name> or anthropic/<model-name>, with the appropriate API key set."
     required: true
-    default: "openai/gpt-4-turbo"
+    default: "openai/gpt-4o-mini"
   openai-api-key:
     description: "OpenAI API key for AI processing"
     required: false
-    default: ${{ secrets.OPENAI_API_KEY }}
   anthropic-api-key:
     description: "Anthropic API key for AI processing"
     required: false
-    default: ${{ secrets.ANTHROPIC_API_KEY }}
+  github-token:
+    description: "GitHub token with repository access"
+    required: true
   dry-run:
     description: 'If "true", will only suggest labels without applying them'
     required: false
@@ -26,13 +23,15 @@ inputs:
   event-number:
     description: "PR or Issue number"
     required: false
-    default: ${{ github.event.number }}
+
+outputs:
+  labels:
+    description: "JSON array of labels that were applied"
 
 runs:
   using: "docker"
   image: "Dockerfile"
   env:
-    GITHUB_TOKEN: ${{ inputs.github-token }}
     OPENAI_API_KEY: ${{ inputs.openai-api-key }}
+    ANTHROPIC_API_KEY: ${{ inputs.anthropic-api-key }}
     CONTROLFLOW_LLM_MODEL: ${{ inputs.controlflow-llm-model }}
-    GITHUB_EVENT_NUMBER: ${{ inputs.event-number }}

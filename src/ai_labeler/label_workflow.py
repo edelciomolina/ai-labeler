@@ -1,4 +1,5 @@
 import os
+import json
 from github import Github
 from .github import (
     get_available_labels,
@@ -10,7 +11,7 @@ from .github import (
 from .ai import labeling_workflow
 
 
-def run_label_workflow() -> None:
+def run_label_workflow() -> list[str]:
     # Set up GitHub client
     gh = Github(os.getenv("INPUT_GITHUB-TOKEN"))
     repo = gh.get_repo(os.getenv("GITHUB_REPOSITORY"))
@@ -33,10 +34,17 @@ def run_label_workflow() -> None:
         item = Issue(title=issue.title, body=issue.body or "")
 
     # Run the labeling workflow
-    chosen_labels = labeling_workflow(item, available_labels)
+    labels = labeling_workflow(item, available_labels)
 
     # Apply the labels
-    apply_labels(gh, chosen_labels)
+    apply_labels(gh, labels)
+
+    # Set output for GitHub Actions
+    if os.getenv("GITHUB_OUTPUT"):
+        with open(os.getenv("GITHUB_OUTPUT"), "a") as f:
+            f.write(f"labels={json.dumps(labels)}\n")
+
+    return labels
 
 
 if __name__ == "__main__":
