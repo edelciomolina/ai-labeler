@@ -78,8 +78,17 @@ def main() -> None:
     # Set up GitHub client
     gh = Github(os.getenv("INPUT_GITHUB-TOKEN"))
     repo = gh.get_repo(os.getenv("GITHUB_REPOSITORY"))
-    number = int(os.getenv("GITHUB_EVENT_NUMBER"))
-    event_type = os.getenv("GITHUB_EVENT_TYPE")
+
+    # Use the input variables directly
+    event_number = os.getenv("INPUT_EVENT-NUMBER")
+    if not event_number:
+        raise ValueError("Missing required input: event-number")
+    try:
+        number = int(event_number)
+    except ValueError:
+        raise ValueError(f"Invalid event-number: '{event_number}' is not a number")
+
+    event_type = os.getenv("INPUT_EVENT-NAME")
 
     # Get available labels
     available_labels = get_available_labels(gh)
