@@ -24,7 +24,7 @@ inputs:
   event-name:
     description: "Event type (pull_request or issues)"
     required: false
-    default: ${{ github.event_name }}
+    default: ${{ github.event.name }}
 
 runs:
   using: "docker"
