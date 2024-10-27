@@ -6,7 +6,7 @@ inputs:
   github-token:
     description: "GitHub token with repository access"
     required: true
-  controlflow-llm-model:
+  controlflow_llm_model:
     description: "ControlFlow model to use for AI processing"
     required: true
     default: "openai/gpt-4-turbo"
@@ -17,12 +17,21 @@ inputs:
     description: "If true, will only suggest labels without applying them"
     required: false
     default: "false"
+  event-number:
+    description: "PR or Issue number"
+    required: false
+    default: ${{ github.event.number }}
+  event-name:
+    description: "Event type (pull_request or issues)"
+    required: false
+    default: ${{ github.event_name }}
 
 runs:
   using: "docker"
   image: "Dockerfile"
   env:
-    GITHUB_EVENT_NUMBER: ${{ github.event.number }}
-    GITHUB_EVENT_TYPE: ${{ github.event_name }}
+    GITHUB_TOKEN: ${{ inputs.github-token }}
     OPENAI_API_KEY: ${{ inputs.openai-api-key }}
-    CONTROLFLOW_LLM_MODEL: ${{ inputs.controlflow-llm-model }}
+    CONTROLFLOW_LLM_MODEL: ${{ inputs.controlflow_llm_model }}
+    GITHUB_EVENT_NUMBER: ${{ inputs.event-number }}
+    GITHUB_EVENT_NAME: ${{ inputs.event-name }}
