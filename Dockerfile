@@ -6,6 +6,6 @@ WORKDIR /app
 COPY . .
 
 # Install the package and its dependencies
-RUN pip install .
+RUN uv pip install .
 
 CMD ["python", "-m", "ai_labeler.main"]
