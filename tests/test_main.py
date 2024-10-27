@@ -1,12 +1,12 @@
 from unittest.mock import Mock, patch
 import pytest
-from ai_labeler.main import (
+from ai_labeler.github import (
     PullRequest,
     Label,
     get_available_labels,
-    labeling_workflow,
     apply_labels,
 )
+from ai_labeler.ai import labeling_workflow
 
 
 @pytest.fixture

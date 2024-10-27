@@ -11,4 +11,4 @@ COPY . .
 # Install the package and its dependencies
 RUN uv pip install . --system
 
-CMD ["python", "-m", "ai_labeler.main"]
+CMD ["python", "-m", "ai_labeler.label_workflow"]

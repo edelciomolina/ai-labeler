@@ -18,7 +18,4 @@ jobs:
       - name: AI Labeler
         uses: ./
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
-          controlflow-model: "openai/gpt-4-turbo"
-          dry-run: false
