@@ -2,8 +2,9 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-# Install uv
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+# Install curl and uv
+RUN apt-get update && apt-get install -y curl && \
+    curl -LsSf https://astral.sh/uv/install.sh | sh 
 
 # Copy the entire project
 COPY . .
