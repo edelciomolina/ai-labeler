@@ -32,7 +32,7 @@ def get_available_labels(gh_client: Github) -> list[Label]:
 def apply_labels(gh_client: Github, labels: list[str]) -> None:
     """Apply the chosen labels to the PR/issue"""
     repo = gh_client.get_repo(os.getenv("GITHUB_REPOSITORY"))
-    number = int(os.getenv("GITHUB_EVENT_NUMBER"))
+    number = get_event_number()
 
     # If dry-run is enabled, just print the labels that would be applied
     if os.getenv("INPUT_DRY-RUN", "false").lower() == "true":
@@ -68,6 +68,7 @@ def labeling_workflow(
         result_type=list[LabelChoice],
         context={"pr_or_issue": item, "all_labels": labels},
         agents=[labeler],
+        model_kwargs=dict(tool_choice="required"),
     )
 
     # The decision.result.labels should still contain just the label names
