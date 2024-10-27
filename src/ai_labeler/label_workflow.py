@@ -1,14 +1,14 @@
 import os
 import json
 from github import Github
-from .github import (
+from ai_labeler.github import (  # Use absolute imports
     get_available_labels,
     apply_labels,
     PullRequest,
     Issue,
     get_event_number,
 )
-from .ai import labeling_workflow
+from ai_labeler.ai import labeling_workflow  # Use absolute imports
 
 
 def run_label_workflow() -> list[str]:
