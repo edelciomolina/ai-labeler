@@ -8,4 +8,4 @@ COPY . .
 # Install the package and its dependencies
 RUN uv pip install .
 
-CMD ["python", "-m", "ai_labeler.main"]
+CMD ["uv", "run", "ai_labeler.main"]
