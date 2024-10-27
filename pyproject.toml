@@ -14,4 +14,4 @@ dev-dependencies = [
 ]
 
 [tool.hatch.build]
-packages = ["src"]
+packages = ["src/ai_labeler"]

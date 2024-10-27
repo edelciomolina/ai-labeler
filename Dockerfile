@@ -1,6 +1,9 @@
-FROM ghcr.io/astral-sh/uv:python3.12-slim-bookworm
+FROM python:3.12-slim
 
 WORKDIR /app
+
+# Install uv
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # Copy the entire project
 COPY . .
@@ -8,4 +11,4 @@ COPY . .
 # Install the package and its dependencies
 RUN uv pip install .
 
-CMD ["uv", "run", "ai_labeler.main"]
+CMD ["python", "-m", "ai_labeler.main"]
