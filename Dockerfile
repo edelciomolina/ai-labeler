@@ -9,6 +9,6 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 COPY . .
 
 # Install the package and its dependencies
-RUN uv pip install .
+RUN uv pip install . --system
 
 CMD ["python", "-m", "ai_labeler.main"]
