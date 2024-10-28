@@ -41,3 +41,7 @@ runs:
     ANTHROPIC_API_KEY: ${{ inputs.anthropic-api-key }}
     CONTROLFLOW_LLM_MODEL: ${{ inputs.controlflow-llm-model }}
     GITHUB_TOKEN: ${{ inputs.github-token }}
+
+branding:
+  icon: tag
+  color: black
