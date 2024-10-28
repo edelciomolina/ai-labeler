@@ -34,12 +34,15 @@ class Config:
                 for name, cfg in data.get("labels", {}).items()
             }
 
+            print(f"Loaded config from {config_path}")
+
             return cls(
                 instructions=data.get("instructions", ""),
                 include_repo_labels=data.get("include_repo_labels", True),
                 labels=label_configs,
             )
         except FileNotFoundError:
+            print(f"No config file found at {config_path}, using default config")
             # If no config file exists, return default config
             return cls(
                 instructions="",
