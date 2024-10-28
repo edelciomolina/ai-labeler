@@ -24,7 +24,7 @@ class Config:
     def load(cls) -> "Config":
         # Get config path from action input, falling back to default
         workspace_path = os.getenv("GITHUB_WORKSPACE")
-        config_path = os.getenv("INPUT_CONFIG-PATH", ".github/ai-labeler.yml")
+        config_path = os.getenv("INPUT_CONFIG-PATH")
         full_path = Path(workspace_path) / config_path
 
         try:
