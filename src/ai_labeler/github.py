@@ -2,7 +2,7 @@ import os
 import json
 from github import Github
 from pydantic import BaseModel
-from typing import Optional
+from dataclasses import dataclass
 
 
 class PullRequest(BaseModel):
@@ -16,9 +16,11 @@ class Issue(BaseModel):
     body: str
 
 
-class Label(BaseModel):
+@dataclass
+class Label:
     name: str
-    description: Optional[str] = None
+    description: str = ""
+    instructions: str | None = None
 
 
 def get_available_labels(gh_client: Github) -> list[Label]:

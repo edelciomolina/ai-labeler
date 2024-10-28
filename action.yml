@@ -17,6 +17,10 @@ inputs:
     description: "GitHub token with repository access"
     required: true
     default: ${{ github.token}}
+  config-path:
+    description: "Path to AI Labeler configuration file"
+    required: false
+    default: ".github/ai-labeler.yml"
   dry-run:
     description: 'If "true", will only suggest labels without applying them'
     required: false
