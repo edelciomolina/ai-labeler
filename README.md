@@ -19,29 +19,28 @@ To get started with the default model (OpenAI's `gpt-4o-mini`), follow these ste
 
 1. Add the following workflow definition to your repo at `.github/workflows/ai-labeler.yml`.
 
-    ```yaml
-    name: AI Labeler
+```yaml
+name: AI Labeler
 
-    on:
-    issues:
-        types: [opened, reopened]
-    pull_request:
-        types: [opened, reopened]
+on:
+  issues:
+    types: [opened, reopened]
+  pull_request:
+    types: [opened, reopened]
 
-    jobs:
-    ai-labeler:
-        runs-on: ubuntu-latest
-        permissions:
-        contents: read
-        issues: write
-        pull-requests: write
-        steps:
-        - uses: actions/checkout@v4
-        - uses: jlowin/ai-labeler@v0.2.0
+jobs:
+  ai-labeler:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jlowin/ai-labeler@v0.2.0
         with:
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
-    ```
-
+```
 2. Add an OpenAI API key to your repository's secrets as `OPENAI_API_KEY`.
 
 That's it! 
