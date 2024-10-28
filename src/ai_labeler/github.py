@@ -3,7 +3,6 @@ import json
 from github import Github
 from pydantic import BaseModel
 from dataclasses import dataclass
-from typing import dict
 
 
 class PullRequest(BaseModel):
