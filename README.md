@@ -32,7 +32,7 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@v4
-      - uses: jlowin/ai-labeler@main
+      - uses: jlowin/ai-labeler@v0.1.0
         with:
           # The default model is openai/gpt-4o-mini, which requires an OpenAI API key
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
