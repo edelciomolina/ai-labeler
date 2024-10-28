@@ -99,33 +99,34 @@ def get_available_labels_from_config(
     Get all available labels, creating any missing ones from config and filtering
     based on config settings.
     """
-
     # Get all repo labels
     repo_labels = get_available_labels(gh_client)
     repo_names = {label.name for label in repo_labels}
 
     # Create any missing labels from config
-    for name, cfg in config.labels.items():
-        if name not in repo_names:
-            print(f"Label {name} was not found on the repository, creating...")
-            create_label(gh_client, name=name, description=cfg.description)
+    for cfg in config.labels:
+        if cfg.name not in repo_names:
+            print(f"Label {cfg.name} was not found on the repository, creating...")
+            create_label(gh_client, name=cfg.name, description=cfg.description or "")
             repo_labels.append(
                 Label(
-                    name=name,
-                    description=cfg.description,
+                    name=cfg.name,
+                    description=cfg.description or "",
                     instructions=cfg.instructions,
                 )
             )
 
     # Filter to only config labels if include_repo_labels is False
     if not config.include_repo_labels:
-        repo_labels = [label for label in repo_labels if label.name in config.labels]
+        config_names = {cfg.name for cfg in config.labels}
+        repo_labels = [label for label in repo_labels if label.name in config_names]
 
     # Enhance labels with config overrides
+    config_map = {cfg.name: cfg for cfg in config.labels}
     for label in repo_labels:
-        if label.name in config.labels:
-            cfg = config.labels[label.name]
-            label.description = cfg.description
+        if label.name in config_map:
+            cfg = config_map[label.name]
+            label.description = cfg.description or label.description
             label.instructions = cfg.instructions
 
     return repo_labels
