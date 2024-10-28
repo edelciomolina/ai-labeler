@@ -23,12 +23,31 @@ class Config:
     @classmethod
     def load(cls) -> "Config":
         # Get config path from action input, falling back to default
-        workspace_path = os.getenv("GITHUB_WORKSPACE")
-        config_path = os.getenv("INPUT_CONFIG-PATH")
-        full_path = Path(workspace_path) / config_path
+        workspace_path = os.getenv("GITHUB_WORKSPACE", "")
+        config_path = os.getenv("INPUT_CONFIG-PATH", ".github/ai-labeler.yml")
 
-        print(full_path)
-        print(__file__)
+        print("=== Debug Info ===")
+        print(f"Workspace path: {workspace_path}")
+        print(f"Config path: {config_path}")
+        print(f"Current working directory: {os.getcwd()}")
+
+        if workspace_path:
+            print("\nWorkspace directory contents:")
+            try:
+                for item in os.listdir(workspace_path):
+                    print(f"- {item}")
+
+                github_dir = Path(workspace_path) / ".github"
+                if github_dir.exists():
+                    print("\n.github directory contents:")
+                    for item in os.listdir(github_dir):
+                        print(f"- {item}")
+            except Exception as e:
+                print(f"Error listing directory: {e}")
+
+        full_path = Path(workspace_path) / config_path
+        print(f"\nTrying to load config from: {full_path}")
+        print(f"Path exists: {full_path.exists()}")
 
         try:
             with open(full_path) as f:
