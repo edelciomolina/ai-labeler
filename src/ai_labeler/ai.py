@@ -10,6 +10,7 @@ def labeling_workflow(
     labels: list[Label],
     instructions: Optional[str] = None,
     context_files: Optional[dict[str, str]] = None,
+    llm_model: Optional[str] = None,
 ) -> list[str]:
     # Load configuration and context files
 
@@ -32,7 +33,8 @@ def labeling_workflow(
         Additional instructions:
         
         {instructions or 'None.'}
-        """.strip(),
+        """,
+        model=llm_model or "openai/gpt-4o-mini",
     )
 
     # Task to analyze and choose labels

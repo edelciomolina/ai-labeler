@@ -9,7 +9,7 @@ from .config_parser import Config
 class PullRequest(BaseModel):
     title: str
     body: str
-    changed_files: list[dict[str, str]]
+    files: dict[str, str]
     author: str  # GitHub username
 
 
