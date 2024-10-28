@@ -1,5 +1,5 @@
 name: "AI Labeler"
-description: "Automatically label PRs and issues using AI"
+description: "Automatically label issues and PRs with AI"
 author: "Jeremiah Lowin"
 
 inputs:
