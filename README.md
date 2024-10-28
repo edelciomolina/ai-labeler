@@ -389,6 +389,14 @@ context_files:
   - CODE_OF_CONDUCT.md
 ```
 
+## 💸 Cost
+
+The cost of using the AI labeler depends on the LLM provider and the model you choose, as well as the size of the issue or PR. Since the LLM output is minimal (a few labels), the cost will be primarily driven by input tokens. 
+
+As a rough estimate, this README is approximately 3000 tokens, which is longer than the typical issue or PR. Processing it would cost about $0.00045 with OpenAI's `gpt-4o-mini`.
+
+That means you could process 10,000 PRs of similar length for under $5.
+
 ## 🤝 Contributing
 
 Issues and PRs welcome! And don't worry about labels – we've got that covered! 😉
