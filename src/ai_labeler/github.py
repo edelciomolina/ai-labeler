@@ -3,10 +3,7 @@ import json
 from github import Github
 from pydantic import BaseModel
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from .ai import Config
+from .config_parser import Config
 
 
 class PullRequest(BaseModel):

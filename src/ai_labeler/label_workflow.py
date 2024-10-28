@@ -1,9 +1,8 @@
 import os
 import json
-import yaml
 from pathlib import Path
-from dataclasses import dataclass
 from github import Github
+from ai_labeler.config_parser import Config
 from ai_labeler.github import (
     get_available_labels_from_config,
     apply_labels,
@@ -12,85 +11,6 @@ from ai_labeler.github import (
     get_event_number,
 )
 from ai_labeler.ai import labeling_workflow
-
-
-@dataclass
-class LabelConfig:
-    name: str
-    description: str | None = None
-    instructions: str | None = None
-
-
-@dataclass
-class Config:
-    instructions: str
-    include_repo_labels: bool
-    labels: list[LabelConfig]
-    context_files: list[str] = None
-
-    @classmethod
-    def load(cls, workspace_path: str = None, config_path: str = None) -> "Config":
-        # Get config path from parameters, falling back to defaults
-        workspace_path = workspace_path or os.getenv("GITHUB_WORKSPACE", "")
-        config_path = config_path or os.getenv(
-            "INPUT_CONFIG-PATH", ".github/ai-labeler.yml"
-        )
-        full_path = Path(workspace_path) / config_path
-
-        try:
-            with open(full_path) as f:
-                data = yaml.safe_load(f)
-
-            labels_data = data.get("labels", [])
-            label_configs = []
-
-            for item in labels_data:
-                if isinstance(item, str):
-                    # Simple string label
-                    label_configs.append(LabelConfig(name=item))
-                else:
-                    # Dict with label name as key
-                    # item is like {"label_name": {"description": "...", "instructions": "..."}}
-                    name, props = next(iter(item.items()))
-                    if props is None:
-                        props = {}
-                    label_configs.append(
-                        LabelConfig(
-                            name=name,
-                            description=props.get("description"),
-                            instructions=props.get("instructions"),
-                        )
-                    )
-
-            return cls(
-                instructions=data.get("instructions", ""),
-                include_repo_labels=data.get("include_repo_labels", True),
-                labels=label_configs,
-                context_files=data.get("context_files", []),
-            )
-        except FileNotFoundError:
-            # If no config file exists, return default config
-            return cls(
-                instructions="",
-                include_repo_labels=True,
-                labels=[],
-                context_files=[],
-            )
-
-    def load_context_files(self, workspace_path: str = None) -> dict[str, str]:
-        """Load the contents of context files"""
-        if not workspace_path:
-            workspace_path = os.getenv("GITHUB_WORKSPACE", "")
-
-        context = {}
-        for file_path in self.context_files or []:
-            full_path = Path(workspace_path) / file_path
-            try:
-                with open(full_path) as f:
-                    context[file_path] = f.read()
-            except FileNotFoundError:
-                print(f"Warning: Context file {file_path} not found")
-        return context
 
 
 def run_label_workflow_from_env() -> list[str]:
@@ -119,6 +39,14 @@ def run_label_workflow(
     github_output: str | None = None,
 ) -> list[str]:
     """Main workflow function that accepts explicit configuration"""
+
+    config_path = config_path or ".github/ai-labeler.yml"
+    github_workspace = github_workspace or os.getenv("GITHUB_WORKSPACE", "")
+    github_output = github_output or os.getenv("GITHUB_OUTPUT")
+
+    # Create full config path
+    full_config_path = Path(github_workspace) / config_path
+
     # Set up GitHub client
     gh = Github(github_token)
     repo = gh.get_repo(github_repository)
@@ -127,11 +55,8 @@ def run_label_workflow(
     number = event_number or get_event_number()
 
     # Load config and get available labels
-    ai_config = Config.load(
-        workspace_path=github_workspace,
-        config_path=config_path,
-    )
-    available_labels = get_available_labels_from_config(gh, ai_config)
+    config = Config.load(config_path=str(full_config_path))
+    available_labels = get_available_labels_from_config(gh, config)
 
     # Get the item to label
     issue = repo.get_issue(number)
@@ -151,7 +76,12 @@ def run_label_workflow(
         )
 
     # Run the labeling workflow
-    labels = labeling_workflow(item=item, labels=available_labels)
+    labels = labeling_workflow(
+        item=item,
+        labels=available_labels,
+        instructions=config.instructions,
+        context_files=config.load_context_files(),
+    )
 
     # Apply the labels
     apply_labels(gh, labels, dry_run=dry_run)

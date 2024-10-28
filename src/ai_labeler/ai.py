@@ -1,16 +1,17 @@
+from enum import Enum
 import controlflow as cf
-from typing import Union
+from typing import Optional, Union
 from .github import PullRequest, Issue, Label
-from .label_workflow import Config
 
 
 @cf.flow
 def labeling_workflow(
-    item: Union[PullRequest, Issue], labels: list[Label]
+    item: Union[PullRequest, Issue],
+    labels: list[Label],
+    instructions: Optional[str] = None,
+    context_files: Optional[dict[str, str]] = None,
 ) -> list[str]:
     # Load configuration and context files
-    config = Config.load()
-    context_files = config.load_context_files()
 
     LabelChoice = Enum(
         "LabelChoice", {label.name: label.name for label in labels}, type=str
@@ -30,7 +31,7 @@ def labeling_workflow(
         
         Additional instructions:
         
-        {config.instructions}
+        {instructions or 'None.'}
         """.strip(),
     )
 
@@ -47,7 +48,7 @@ def labeling_workflow(
         context={
             "pr_or_issue": item,
             "all_labels": labels,
-            "additional_files": context_files,
+            "context_files": context_files,
         },
         agents=[labeler],
         model_kwargs=dict(tool_choice="required"),
