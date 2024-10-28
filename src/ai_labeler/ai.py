@@ -27,6 +27,9 @@ class Config:
         config_path = os.getenv("INPUT_CONFIG-PATH")
         full_path = Path(workspace_path) / config_path
 
+        print(full_path)
+        print(__file__)
+
         try:
             with open(full_path) as f:
                 data = yaml.safe_load(f)
