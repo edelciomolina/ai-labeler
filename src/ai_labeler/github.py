@@ -3,6 +3,7 @@ import json
 from github import Github
 from pydantic import BaseModel
 from dataclasses import dataclass
+from typing import dict
 
 
 class PullRequest(BaseModel):
@@ -23,11 +24,25 @@ class Label:
     instructions: str | None = None
 
 
+# Simple cache to store labels per repository
+_label_cache: dict[str, list[Label]] = {}
+
+
 def get_available_labels(gh_client: Github) -> list[Label]:
     """Fetch available labels and their descriptions from the repository"""
-    repo = gh_client.get_repo(os.getenv("GITHUB_REPOSITORY"))
+    repo_name = os.getenv("GITHUB_REPOSITORY")
+
+    # Return cached result if available
+    if repo_name in _label_cache:
+        return _label_cache[repo_name]
+
+    # Fetch and cache labels
+    repo = gh_client.get_repo(repo_name)
     labels = repo.get_labels()
-    return [Label(name=label.name, description=label.description) for label in labels]
+    result = [Label(name=label.name, description=label.description) for label in labels]
+
+    _label_cache[repo_name] = result
+    return result
 
 
 def apply_labels(gh_client: Github, labels: list[str]) -> None:
@@ -64,3 +79,9 @@ def get_event_number() -> int:
             )
 
     raise ValueError("Could not find PR/Issue number")
+
+
+def create_label(gh_client: Github, name: str, description: str) -> None:
+    """Create a new label on the repository"""
+    repo = gh_client.get_repo(os.getenv("GITHUB_REPOSITORY"))
+    repo.create_label(name=name, description=description, color="ededed")

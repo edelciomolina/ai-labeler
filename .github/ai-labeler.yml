@@ -5,6 +5,9 @@ instructions: |
   carefully check if the issue describes actual broken functionality versus a 
   feature request or question.
 
+# If false, only labels defined here can be used. Default: true
+include_repo_labels: true
+
 # Define and customize labels.
 labels:
   bug:
@@ -31,7 +34,3 @@ labels:
     instructions: |
       For issues that are primarily asking how to use the project or seeking 
       clarification about functionality.
-
-# If true, only consider labels defined in this file. Otherwise, use all labels
-# found on the repo but follow any instructions provided here.
-strict_labels: false

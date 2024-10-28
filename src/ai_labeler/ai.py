@@ -4,7 +4,7 @@ from enum import Enum
 import controlflow as cf
 from typing import Union
 from dataclasses import dataclass
-from .github import PullRequest, Issue, Label
+from .github import PullRequest, Issue, Label, create_label, get_available_labels
 
 
 @dataclass
@@ -16,7 +16,7 @@ class LabelConfig:
 @dataclass
 class Config:
     instructions: str
-    strict_labels: bool
+    include_repo_labels: bool
     labels: dict[str, LabelConfig]
 
     @classmethod
@@ -36,27 +36,46 @@ class Config:
 
             return cls(
                 instructions=data.get("instructions", ""),
-                strict_labels=data.get("strict_labels", False),
+                include_repo_labels=data.get("include_repo_labels", True),
                 labels=label_configs,
             )
         except FileNotFoundError:
             # If no config file exists, return default config
             return cls(
                 instructions="",
-                strict_labels=False,
+                include_repo_labels=True,
                 labels={},
             )
 
 
+def sync_config_labels(config: Config, gh_client) -> list[Label]:
+    """
+    Ensure all labels from config exist on the repo and return updated label list.
+    """
+    existing_labels = get_available_labels(gh_client)
+    existing_names = {label.name for label in existing_labels}
+
+    # Create any missing labels
+    for name, cfg in config.labels.items():
+        if name not in existing_names:
+            create_label(gh_client, name=name, description=cfg.description)
+            existing_labels.append(Label(name=name, description=cfg.description))
+
+    return existing_labels
+
+
 @cf.flow
 def labeling_workflow(
-    item: Union[PullRequest, Issue], labels: list[Label]
+    item: Union[PullRequest, Issue], labels: list[Label], gh_client
 ) -> list[str]:
     # Load configuration
     config = Config.load()
 
+    # Ensure all config labels exist and get updated label list
+    labels = sync_config_labels(config, gh_client)
+
     # If strict_labels is True, filter labels to only those in config
-    if config.strict_labels:
+    if not config.include_repo_labels:
         labels = [label for label in labels if label.name in config.labels]
 
     # Enhance labels with config instructions
