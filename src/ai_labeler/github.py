@@ -105,6 +105,7 @@ def get_available_labels_from_config(
     # Create any missing labels from config
     for name, cfg in config.labels.items():
         if name not in repo_names:
+            print(f"Label {name} was not found on the repository, creating...")
             create_label(gh_client, name=name, description=cfg.description)
             repo_labels.append(
                 Label(
