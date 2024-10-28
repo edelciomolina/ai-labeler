@@ -3,6 +3,10 @@ import json
 from github import Github
 from pydantic import BaseModel
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .ai import Config
 
 
 class PullRequest(BaseModel):
@@ -84,3 +88,41 @@ def create_label(gh_client: Github, name: str, description: str) -> None:
     """Create a new label on the repository"""
     repo = gh_client.get_repo(os.getenv("GITHUB_REPOSITORY"))
     repo.create_label(name=name, description=description, color="ededed")
+
+
+def get_available_labels_from_config(
+    gh_client: Github, config: "Config"
+) -> list[Label]:
+    """
+    Get all available labels, creating any missing ones from config and filtering
+    based on config settings.
+    """
+
+    # Get all repo labels
+    repo_labels = get_available_labels(gh_client)
+    repo_names = {label.name for label in repo_labels}
+
+    # Create any missing labels from config
+    for name, cfg in config.labels.items():
+        if name not in repo_names:
+            create_label(gh_client, name=name, description=cfg.description)
+            repo_labels.append(
+                Label(
+                    name=name,
+                    description=cfg.description,
+                    instructions=cfg.instructions,
+                )
+            )
+
+    # Filter to only config labels if include_repo_labels is False
+    if not config.include_repo_labels:
+        repo_labels = [label for label in repo_labels if label.name in config.labels]
+
+    # Enhance labels with config overrides
+    for label in repo_labels:
+        if label.name in config.labels:
+            cfg = config.labels[label.name]
+            label.description = cfg.description
+            label.instructions = cfg.instructions
+
+    return repo_labels

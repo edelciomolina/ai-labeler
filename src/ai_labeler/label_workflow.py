@@ -1,14 +1,14 @@
 import os
 import json
 from github import Github
-from ai_labeler.github import (  # Use absolute imports
-    get_available_labels,
+from ai_labeler.github import (
+    get_available_labels_from_config,
     apply_labels,
     PullRequest,
     Issue,
     get_event_number,
 )
-from ai_labeler.ai import labeling_workflow  # Use absolute imports
+from ai_labeler.ai import labeling_workflow, Config
 
 
 def run_label_workflow() -> list[str]:
@@ -19,9 +19,11 @@ def run_label_workflow() -> list[str]:
     # Get the PR/Issue number
     number = get_event_number()
 
-    # Get available labels
-    available_labels = get_available_labels(gh)
+    # Load config and get available labels
+    config = Config.load()
+    available_labels = get_available_labels_from_config(gh, config)
 
+    # Get the item to label
     issue = repo.get_issue(number)
     if issue.pull_request:
         pr = repo.get_pull(number)
@@ -34,7 +36,7 @@ def run_label_workflow() -> list[str]:
         item = Issue(title=issue.title, body=issue.body or "")
 
     # Run the labeling workflow
-    labels = labeling_workflow(item=item, labels=available_labels, gh_client=gh)
+    labels = labeling_workflow(item=item, labels=available_labels)
 
     # Apply the labels
     apply_labels(gh, labels)

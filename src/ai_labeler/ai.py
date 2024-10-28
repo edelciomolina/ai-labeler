@@ -1,11 +1,10 @@
 import os
-from github import Github
 import yaml
 from enum import Enum
 import controlflow as cf
 from typing import Union
 from dataclasses import dataclass
-from .github import PullRequest, Issue, Label, create_label, get_available_labels
+from .github import PullRequest, Issue, Label
 
 
 @dataclass
@@ -49,42 +48,12 @@ class Config:
             )
 
 
-def sync_config_labels(config: Config, gh_client) -> list[Label]:
-    """
-    Ensure all labels from config exist on the repo and return updated label list.
-    """
-    existing_labels = get_available_labels(gh_client)
-    existing_names = {label.name for label in existing_labels}
-
-    # Create any missing labels
-    for name, cfg in config.labels.items():
-        if name not in existing_names:
-            create_label(gh_client, name=name, description=cfg.description)
-            existing_labels.append(Label(name=name, description=cfg.description))
-
-    return existing_labels
-
-
 @cf.flow
 def labeling_workflow(
-    item: Union[PullRequest, Issue], labels: list[Label], gh_client: Github
+    item: Union[PullRequest, Issue], labels: list[Label]
 ) -> list[str]:
     # Load configuration
     config = Config.load()
-
-    # Ensure all config labels exist and get updated label list
-    labels = sync_config_labels(config, gh_client)
-
-    # If strict_labels is True, filter labels to only those in config
-    if not config.include_repo_labels:
-        labels = [label for label in labels if label.name in config.labels]
-
-    # Enhance labels with config instructions
-    for label in labels:
-        if label.name in config.labels:
-            cfg = config.labels[label.name]
-            label.description = cfg.description
-            label.instructions = cfg.instructions
 
     LabelChoice = Enum(
         "LabelChoice", {label.name: label.name for label in labels}, type=str
