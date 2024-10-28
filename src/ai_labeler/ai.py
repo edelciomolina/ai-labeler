@@ -1,4 +1,5 @@
 import os
+from github import Github
 import yaml
 from enum import Enum
 import controlflow as cf
@@ -66,7 +67,7 @@ def sync_config_labels(config: Config, gh_client) -> list[Label]:
 
 @cf.flow
 def labeling_workflow(
-    item: Union[PullRequest, Issue], labels: list[Label], gh_client
+    item: Union[PullRequest, Issue], labels: list[Label], gh_client: Github
 ) -> list[str]:
     # Load configuration
     config = Config.load()

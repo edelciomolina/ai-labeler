@@ -34,7 +34,7 @@ def run_label_workflow() -> list[str]:
         item = Issue(title=issue.title, body=issue.body or "")
 
     # Run the labeling workflow
-    labels = labeling_workflow(item, available_labels)
+    labels = labeling_workflow(item=item, labels=available_labels, gh_client=gh)
 
     # Apply the labels
     apply_labels(gh, labels)
