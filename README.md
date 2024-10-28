@@ -34,7 +34,7 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@v4
-      - uses: jlowin/ai-labeler@v0.1.0
+      - uses: jlowin/ai-labeler@v0.2.0
         with:
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
 ```
@@ -54,7 +54,7 @@ You must specify an LLM provider and provide an API key. You can use either Open
 #### LLM Model
 
 ```yaml
-- uses: jlowin/ai-labeler@v0.1.0
+- uses: jlowin/ai-labeler@v0.2.0
   with:
     controlflow-llm-model: openai/gpt-4o-mini
 ```
@@ -70,7 +70,7 @@ Note that you must provide an appropriate API key for your selected LLM provider
 #### OpenAI
 
 ```yaml
-- uses: jlowin/ai-labeler@v0.1.0
+- uses: jlowin/ai-labeler@v0.2.0
   with:
     openai-api-key: ${{ secrets.OPENAI_API_KEY }}
     
@@ -83,7 +83,7 @@ Set your OpenAI API key as a repository secret named `OPENAI_API_KEY`. Since the
 #### Anthropic
 
 ```yaml
-- uses: jlowin/ai-labeler@v0.1.0
+- uses: jlowin/ai-labeler@v0.2.0
   with:
     anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
 
@@ -98,7 +98,7 @@ Set your Anthropic API key as a repository secret named `ANTHROPIC_API_KEY`. To 
 By default, the action looks for additional configuration in `.github/ai-labeler.yml`. You can specify a different location:
 
 ```yaml
-- uses: jlowin/ai-labeler@v0.1.0
+- uses: jlowin/ai-labeler@v0.2.0
   with:
     config-path: .github/my-custom-config.yml
 ```
