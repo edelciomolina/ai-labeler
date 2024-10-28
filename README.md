@@ -1,6 +1,8 @@
-# 🤖 AI Labeler
+# 🦾🏷️ AI Labeler
 
-Let AI handle the labeling! This GitHub Action uses LLMs to label your issues and PRs, keeping your repo organized while you focus on what matters.
+Let AI handle the labeling! 
+
+This GitHub Action uses LLMs to label your issues and PRs, keeping your repo organized while you focus on what matters.
 
 ## ✨ Features
 
