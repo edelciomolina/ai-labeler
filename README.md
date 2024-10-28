@@ -38,8 +38,8 @@ To get started with the default model (OpenAI's `gpt-4o-mini`), follow these ste
         steps:
         - uses: actions/checkout@v4
         - uses: jlowin/ai-labeler@v0.2.0
-            with:
-            openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
     ```
 
 2. Add an OpenAI API key to your repository's secrets as `OPENAI_API_KEY`.
