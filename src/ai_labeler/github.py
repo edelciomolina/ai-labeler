@@ -13,11 +13,13 @@ class PullRequest(BaseModel):
     title: str
     body: str
     changed_files: list[dict[str, str]]
+    author: str  # GitHub username
 
 
 class Issue(BaseModel):
     title: str
     body: str
+    author: str  # GitHub username
 
 
 @dataclass

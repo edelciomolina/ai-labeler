@@ -1,17 +1,26 @@
 # 🤖 AI Labeler
 
-Let AI handle the labeling! This GitHub Action uses LLMs to label your issues and PRs, keeping your repo organized while you focus on what matters.
+Let an LLM handle the labeling! 
+
+This GitHub Action uses AI to label your issues and PRs, keeping your repo organized so you can focus on what matters.
+
+
 
 ## ✨ Features
 
 - **Smart Analysis**: Understands context from titles, descriptions, and code changes
+- **Incremental**: Works alongside other label management tools and manual labeling
 - **Zero Config**: Works out of the box with your existing GitHub labels
 - **Customizable**: Fine-tune behavior with optional configuration
 - **Reliable**: Supports OpenAI and Anthropic's latest models, orchestrated with ControlFlow
 
 ## 🚀 Quick Start
 
-1. Create `.github/workflows/ai-labeler.yml`:
+1. Add `.github/workflows/ai-labeler.yml` to your repo.
+2. Add your API key(s) to your repository's secrets using the same names as `ai-labeler.yml` expects.
+
+Here is a full example of `ai-labeler.yml` that you can copy and paste into your repo. Make sure to set the `OPENAI_API_KEY` secret!
+
 
 ```yaml
 name: AI Labeler
@@ -34,8 +43,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: jlowin/ai-labeler@v0.1.0
         with:
-          # The default model is openai/gpt-4o-mini, which requires an OpenAI API key
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+
+          # --- Optional settings ---
           
           # Optional: use a different model
           # controlflow-llm-model: anthropic/claude-3-sonnet-20240229
@@ -47,7 +57,6 @@ jobs:
           # config-path: .github/ai-labeler.yml
 ```
 
-2. Add your API key(s) to your repository's secrets using the same names as in your workflow file.
 
 That's it! The AI will read your repository's existing labels and their descriptions to make smart labeling decisions. Want to improve the AI's accuracy? Just update your label descriptions in GitHub's UI.
 
@@ -75,9 +84,20 @@ instructions: |
   - Applying 'help wanted' to good first-time contributor opportunities
   - Being generous with 'good first issue' to encourage new contributors
 
-# Define or enhance specific labels
+
+# If false, only use labels defined in this file (default: true)
+include_repo_labels: false
+
+# Define or enhance specific label behaviors
 labels:
-  documentation:
+  # simple form: just the name
+  - includes-question
+
+  # expanded form: name, optional description, and optional instructions
+  - maintainer:
+    description: "Opened by a maintainer (@abc, @xyz, etc.)"
+
+  - documentation:
     description: "Documentation changes"
     instructions: |
       Apply when changes are primarily documentation-focused:
@@ -86,7 +106,7 @@ labels:
       - Issues requesting clearer docs or examples
       - For PRs, look for changes in docs/ directory or .md files
         
-  deps:
+  - deps:
     description: "Dependency updates"
     instructions: |
       For changes to project dependencies:
@@ -94,7 +114,7 @@ labels:
       - Version bumps in package configs
       - Don't apply for documentation-only dependency changes
       
-  security:
+  - security:
     description: "Security-related changes"
     instructions: |
       High priority! Apply when:
@@ -103,7 +123,7 @@ labels:
       - Changes touch security-critical code paths
       Look especially at changes in security/, auth/, or crypto/ directories
 
-  ui:
+  - ui:
     description: "User interface changes"
     instructions: |
       For frontend and UI-related changes:

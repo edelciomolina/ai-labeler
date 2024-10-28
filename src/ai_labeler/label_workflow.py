@@ -31,9 +31,14 @@ def run_label_workflow() -> list[str]:
             title=pr.title,
             body=pr.body or "",
             changed_files=[{f.filename: f.patch} for f in pr.get_files()],
+            author=pr.user.login,  # Add this
         )
     else:
-        item = Issue(title=issue.title, body=issue.body or "")
+        item = Issue(
+            title=issue.title,
+            body=issue.body or "",
+            author=issue.user.login,  # Add this
+        )
 
     # Run the labeling workflow
     labels = labeling_workflow(item=item, labels=available_labels)
