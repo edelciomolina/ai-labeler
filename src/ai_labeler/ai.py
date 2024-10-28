@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import yaml
 from enum import Enum
 import controlflow as cf
@@ -22,10 +23,12 @@ class Config:
     @classmethod
     def load(cls) -> "Config":
         # Get config path from action input, falling back to default
+        workspace_path = os.getenv("GITHUB_WORKSPACE")
         config_path = os.getenv("INPUT_CONFIG-PATH", ".github/ai-labeler.yml")
+        full_path = Path(workspace_path) / config_path
 
         try:
-            with open(config_path) as f:
+            with open(full_path) as f:
                 data = yaml.safe_load(f)
 
             # Convert the labels dict to use LabelConfig objects
