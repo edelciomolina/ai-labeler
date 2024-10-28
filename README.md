@@ -1,6 +1,6 @@
 # 🤖 AI Labeler
 
-Let AI handle the labeling busywork! This GitHub Action uses LLMs to intelligently label your issues and PRs, keeping your repository organized while you focus on what matters.
+Let AI handle the labeling! This GitHub Action uses LLMs to label your issues and PRs, keeping your repo organized while you focus on what matters.
 
 ## ✨ Features
 
@@ -16,6 +16,7 @@ Let AI handle the labeling busywork! This GitHub Action uses LLMs to intelligent
 ```yaml
 name: AI Labeler
 
+# Trigger on issues and PRs
 on:
   issues:
     types: [opened, reopened]
@@ -23,7 +24,7 @@ on:
     types: [opened, reopened]
 
 jobs:
-  label:
+  ai-labeler:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -41,6 +42,9 @@ jobs:
           
           # Required if using an Anthropic model:
           # anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
+
+          # Optional: your config file path
+          # config-path: .github/ai-labeler.yml
 ```
 
 2. Add your API key(s) to your repository's secrets using the same names as in your workflow file.
@@ -53,7 +57,7 @@ You can create a config file to provide additional instructions and control over
 
 ### Configuration Options
 
-Create `.github/ai-labeler.yml` with any of these options:
+Create `.github/ai-labeler.yml` (default location; can be overridden by setting the `config-path` input) with any of these options:
 
 - `instructions`: Overall guidance for the AI labeler
 - `include_repo_labels`: Whether to include repository labels not defined in config (default: true)
