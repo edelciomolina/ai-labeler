@@ -15,36 +15,42 @@ This GitHub Action uses AI to label your issues and PRs, keeping your repo organ
 
 ## 🚀 Quick Start
 
-1. Add this `.github/workflows/ai-labeler.yml` to your repo:
+To get started with the default model (OpenAI's `gpt-4o-mini`), follow these steps:
 
-```yaml
-name: AI Labeler
-on:
-  issues:
-    types: [opened, reopened]
-  pull_request:
-    types: [opened, reopened]
+1. Add the following workflow definition to your repo at `.github/workflows/ai-labeler.yml`.
 
-jobs:
-  ai-labeler:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      issues: write
-      pull-requests: write
-    steps:
-      - uses: actions/checkout@v4
-      - uses: jlowin/ai-labeler@v0.2.0
-        with:
-          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
-```
+    ```yaml
+    name: AI Labeler
 
-2. Add your OpenAI API key to your repository's secrets as `OPENAI_API_KEY`.
+    on:
+    issues:
+        types: [opened, reopened]
+    pull_request:
+        types: [opened, reopened]
 
-That's it! The AI will read your repository's existing labels and their descriptions to make smart labeling decisions. Want to improve the AI's accuracy? Just update your label descriptions in GitHub's UI.
+    jobs:
+    ai-labeler:
+        runs-on: ubuntu-latest
+        permissions:
+        contents: read
+        issues: write
+        pull-requests: write
+        steps:
+        - uses: actions/checkout@v4
+        - uses: jlowin/ai-labeler@v0.2.0
+            with:
+            openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+    ```
+
+2. Add an OpenAI API key to your repository's secrets as `OPENAI_API_KEY`.
+
+That's it! 
+
+Whenever an issue or PR is opened, the action will read your repository's existing labels and their descriptions to make smart labeling decisions. To improve its accuracy, update your label descriptions in GitHub's UI or provide a fine-tuning configuration file as described below.
 
 ## ⚙️ Configuration
-This action supports a few required and optional settings. 
+
+The following settings must be provided as part of the workflow definition file.
 
 ### LLM Configuration
 
@@ -53,17 +59,19 @@ You must specify an LLM provider and provide an API key. You can use either Open
 
 #### LLM Model
 
+By default, the AI labeler uses OpenAI's `gpt-4o-mini` model. You can specify a different model if you'd like:
+
 ```yaml
 - uses: jlowin/ai-labeler@v0.2.0
   with:
     controlflow-llm-model: openai/gpt-4o-mini
 ```
 
-The `controlflow-llm-model` input determines which model to use. Supported formats:
+Supported formats:
 - OpenAI: `openai/<model-name>` (e.g., "openai/gpt-4o-mini")
 - Anthropic: `anthropic/<model-name>` (e.g., "anthropic/claude-3-5-sonnet-20241022")
 
-The default is "openai/gpt-4o-mini". See the [ControlFlow LLM documentation](https://controlflow.ai/guides/configure-llms#automatic-configuration) for more information on supported models.
+See the [ControlFlow LLM documentation](https://controlflow.ai/guides/configure-llms#automatic-configuration) for more information on supported models.
 
 Note that you must provide an appropriate API key for your selected LLM provider.
 
@@ -93,7 +101,7 @@ Set your OpenAI API key as a repository secret named `OPENAI_API_KEY`. Since the
 
 Set your Anthropic API key as a repository secret named `ANTHROPIC_API_KEY`. To use Anthropic, you must specify a model.
 
-### Fine-Tuning Configuration File
+### Fine-Tuning Configuration Location
 
 By default, the action looks for additional configuration in `.github/ai-labeler.yml`. You can specify a different location:
 
@@ -107,7 +115,19 @@ This file controls the labeling behavior - see the Fine-Tuning section below for
 
 ## 🎯 Fine-Tuning
 
-You can create a config file to customize the labeling behavior. By default, the action looks for `.github/ai-labeler.yml`.
+In addition to choosing a model, you can create a config file to fine-tune the labeling behavior. By default, the action looks for a file at `.github/ai-labeler.yml`. If no file is found, it will use the default behavior.
+
+This file should have the following format; each section is optional and described in full below.
+
+```yaml
+instructions: |
+  "..."
+labels:
+  - ...
+context_files:
+  - ...
+include_repo_labels: true
+```
 
 
 ### Instructions
