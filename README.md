@@ -1,4 +1,4 @@
-# 🤖 AI Labeler
+# 🦾🏷️ AI Labeler
 
 Let an LLM handle the labeling! 
 
