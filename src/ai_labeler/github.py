@@ -50,13 +50,13 @@ def get_available_labels(gh_client: Github) -> list[Label]:
     return result
 
 
-def apply_labels(gh_client: Github, labels: list[str]) -> None:
+def apply_labels(gh_client: Github, labels: list[str], dry_run: bool = False) -> None:
     """Apply the chosen labels to the PR/issue"""
     repo = gh_client.get_repo(os.getenv("GITHUB_REPOSITORY"))
     number = get_event_number()
 
     # If dry-run is enabled, just print the labels that would be applied
-    if os.getenv("INPUT_DRY-RUN", "false").lower() == "true":
+    if dry_run:
         print(f"Dry run: Would apply labels {labels} to #{number}")
         return
 
