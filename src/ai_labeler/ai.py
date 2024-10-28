@@ -41,9 +41,18 @@ class Config:
                     # Simple string label
                     label_configs.append(LabelConfig(name=item))
                 else:
-                    # Dict with additional properties
-                    name = item.pop("name")
-                    label_configs.append(LabelConfig(name=name, **item))
+                    # Dict with label name as key
+                    # item is like {"label_name": {"description": "...", "instructions": "..."}}
+                    name, props = next(iter(item.items()))
+                    if props is None:
+                        props = {}
+                    label_configs.append(
+                        LabelConfig(
+                            name=name,
+                            description=props.get("description"),
+                            instructions=props.get("instructions"),
+                        )
+                    )
 
             return cls(
                 instructions=data.get("instructions", ""),
