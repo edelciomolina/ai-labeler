@@ -48,6 +48,10 @@ def labeling_workflow(
         handlers=[],
     )
 
-    print(decision.model_dump_json(indent=2))
+    selected_labels = [labels[i].name for i in decision.label_indices]
 
-    return [labels[i].name for i in decision.label_indices]
+    print(f"Available labels: {dict(enumerate(labels))}")
+    print(f"Reasoning: {decision.reasoning}")
+    print(f"Selected labels: {selected_labels}")
+
+    return selected_labels
