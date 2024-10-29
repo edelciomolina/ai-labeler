@@ -39,9 +39,10 @@ jobs:
       - uses: actions/checkout@v4
       - uses: jlowin/ai-labeler@v0.2.1
         with:
+          include-repo-labels: true
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
 ```
-2. Add an OpenAI API key to your repository's secrets as `OPENAI_API_KEY`.
+1. Add an OpenAI API key to your repository's secrets as `OPENAI_API_KEY`.
 
 That's it! 
 
@@ -49,7 +50,19 @@ Whenever an issue or PR is opened, the action will read your repository's existi
 
 ## ⚙️ Configuration
 
-The following settings must be provided as part of the workflow definition file.
+The following settings can be provided as part of the workflow definition file:
+
+### Repository Label Behavior
+
+By default, the AI labeler will use all labels found in your repository, as well as those specifically defined in your config file. This can lead to unexpected results if your repository contains labels that don't make sense for the AI to apply, or contains very many labels.
+
+To disable this behavior, set `include-repo-labels` to `false`. In this case, the AI will only use labels defined in your config file. See the fine-tuning section below for more details.
+
+```yaml
+- uses: jlowin/ai-labeler@v0.2.1
+  with:
+    include-repo-labels: false  # Only use labels defined in config
+```
 
 ### LLM Configuration
 
@@ -125,9 +138,7 @@ labels:
   - ...
 context_files:
   - ...
-include_repo_labels: true
 ```
-
 
 ### Instructions
 
@@ -141,20 +152,9 @@ instructions: |
   - Being generous with 'good first issue' to encourage new contributors
 ```
 
-### Include Repository Labels
-
-By default, the AI will use all labels that have been defined in your repository, including the enhanced definitions provided in your fine-tuning file. You can override this behavior to ONLY use the labels defined in this file:
-
-```yaml
-# If false, only use labels defined in this file (default: true)
-include_repo_labels: false
-```
-
-Note that if `include_repo_labels` is `true`, the descriptions and instructions you provide in this file will override any defined in the repository. 
-
 ### Label Definitions
 
-In the labels section, you can define or enhance specific labels that you want the AI to use. Any labels defined here that do not already exist in your repository will be created automatically. Note that this section's behavior is impacted by the `include_repo_labels` setting.
+In the labels section, you can define or enhance specific labels that you want the AI to use. Any labels defined here that do not already exist in your repository will be created automatically. The behavior of whether these are used alongside existing repository labels is controlled by the `include-repo-labels` action input.
 
 ```yaml
 labels:

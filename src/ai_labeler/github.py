@@ -89,11 +89,14 @@ def create_label(gh_client: Github, name: str, description: str) -> None:
 
 
 def get_available_labels_from_config(
-    gh_client: Github, config: "Config"
+    gh_client: Github,
+    config: "Config",
+    *,
+    include_repo_labels: bool = True,
 ) -> list[Label]:
     """
     Get all available labels, creating any missing ones from config and filtering
-    based on config settings.
+    based on settings.
     """
     # Get all repo labels
     repo_labels = get_available_labels(gh_client)
@@ -113,7 +116,7 @@ def get_available_labels_from_config(
             )
 
     # Filter to only config labels if include_repo_labels is False
-    if not config.include_repo_labels:
+    if not include_repo_labels:
         config_names = {cfg.name for cfg in config.labels}
         repo_labels = [label for label in repo_labels if label.name in config_names]
 
@@ -124,7 +127,6 @@ def get_available_labels_from_config(
     for label in repo_labels:
         if label.name in config_map:
             cfg = config_map[label.name]
-            # Create a new label instead of modifying in place
             label = Label(
                 name=label.name,
                 description=cfg.description or label.description,

@@ -28,6 +28,10 @@ inputs:
   event-number:
     description: "PR or Issue number"
     required: false
+  include-repo-labels:
+    description: "If true, use all repository labels in addition to config-defined labels"
+    required: false
+    default: "true"
 
 outputs:
   labels:

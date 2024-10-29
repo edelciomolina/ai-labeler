@@ -14,7 +14,6 @@ class LabelConfig(BaseModel):
 
 class Config(BaseModel):
     instructions: Optional[str] = None
-    include_repo_labels: bool = True
     labels: list[LabelConfig] = []
     context_files: list[str] = []
 
@@ -46,7 +45,6 @@ class Config(BaseModel):
 
             return cls(
                 instructions=data.get("instructions", ""),
-                include_repo_labels=data.get("include_repo_labels", True),
                 labels=label_configs,
                 context_files=data.get("context_files", []),
             )
@@ -54,7 +52,6 @@ class Config(BaseModel):
             # If no config file exists, return default config
             return cls(
                 instructions="",
-                include_repo_labels=True,
                 labels=[],
                 context_files=[],
             )
