@@ -1,3 +1,4 @@
+import os
 from typing import Optional
 from pydantic import BaseModel
 import yaml
@@ -59,8 +60,13 @@ class Config(BaseModel):
                 context_files=[],
             )
 
-    def load_context_files(self, repo_root_path: str) -> dict[str, str]:
+    def load_context_files(self, repo_root_path: str = None) -> dict[str, str]:
         """Load the contents of context files"""
+
+        repo_root_path = repo_root_path or os.getenv("GITHUB_WORKSPACE")
+        if repo_root_path is None:
+            raise ValueError("repo_root_path is required and could not be inferred")
+
         context = {}
         for file_path in self.context_files or []:
             full_path = Path(repo_root_path) / file_path
