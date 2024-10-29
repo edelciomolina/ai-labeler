@@ -1,7 +1,7 @@
 import controlflow as cf
 from typing import Optional, Union
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from .github import PullRequest, Issue, Label
 
 
@@ -14,9 +14,15 @@ def labeling_workflow(
     llm_model: Optional[str] = None,
 ) -> list[str]:
     class Decision(BaseModel):
-        # without reasoning, gpt-4o-mini sometimes ignores label instructions
-        reasoning: str = Field(description="A few sentences explaining your decision.")
-        label_indices: list[int]
+        reasoning: str
+        applied_labels: list[str]
+
+        def validate_labels(cls, v):
+            if any(label not in [l.name for l in labels] for label in v):
+                raise ValueError(
+                    f"Invalid labels. Must be one of {', '.join(f"{l.name}" for l in labels)}"
+                )
+            return v
 
     # Create an agent specialized in GitHub labeling
     labeler = cf.Agent(
@@ -28,13 +34,42 @@ def labeling_workflow(
         model=llm_model or "openai/gpt-4o-mini",
     )
 
-    # Task to analyze and choose labels
     decision = cf.run(
         """
-        Select labels for the provided PR/issue. Consider all available context, including description and files. Choose the index of the most
-        appropriate labels; you may assign any number of labels or none at all.
+        Consider the provided PR/issue and its context. Examine each available
+        label carefully. 
         
-        You MUST read label instructions carefully to see if they are appropriate for this PR/issue.
+        Each label has a name and optional description and instructions. Treat
+        all three as instructions for understanding whether the label is
+        relevant.
+        
+        For labels that seem appropriate, provide a complete rationale of
+        whether you would assign them to the PR/issue, taking your instructions
+        and the label's instructions into account. Some labels will have
+        specific instructions about when to apply them, or whether to apply them
+        at all. These instructions take precedence over the label's inherent
+        relevance. Be sure to reference all relevant context and instructions in
+        your reasoning.
+        
+        You may select any number of labels or none at all. You do not need to
+        reason about labels that are obviously irrelevant.
+        
+        Example reasoning format:
+        
+        - Label <name>: 
+            
+            -- <are there any instructions that apply to this label's
+            applicability other than explaining its meaning?> 
+            
+            -- <reason about the label's applicability: do any instructions
+            apply that would affect your decision?> 
+            
+            -- Apply label to PR/issue: <decision yes / no>
+          
+        - Label 2: 
+        
+            -- ...
+            
         """,
         instructions=instructions,
         result_type=Decision,
@@ -44,14 +79,12 @@ def labeling_workflow(
             "additional_context": context_files,
         },
         agents=[labeler],
-        model_kwargs=dict(tool_choice="required"),
-        handlers=[],
+        completion_tools=["SUCCEED"],  # the task can not be marked as failed
+        model_kwargs=dict(tool_choice="required"),  # prevent chatting
     )
 
-    selected_labels = [labels[i].name for i in decision.label_indices]
-
     print(f"Available labels: {dict(enumerate(labels))}")
-    print(f"Reasoning: {decision.reasoning}")
-    print(f"Selected labels: {selected_labels}")
+    print(f"\n\nReasoning: {decision.reasoning}")
+    print(f"\n\nApplied labels: {decision.applied_labels}")
 
-    return selected_labels
+    return decision.applied_labels

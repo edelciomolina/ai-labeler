@@ -13,6 +13,7 @@ dev = [
     "pytest-cov>=5.0.0",
     "copychat>=0.1.0",
     "pyyaml>=6.0.1",          # For YAML config testing
+    "pytest-xdist>=3.2.1",    # For parallel testing
 ]
 
 [tool.hatch.build]

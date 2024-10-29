@@ -1,29 +1,5 @@
 from ai_labeler.ai import labeling_workflow
 from ai_labeler.github import PullRequest, Issue, Label
-import pytest
-import functools
-
-
-def requires_gpt4o(test_func):
-    """
-    Decorator that runs a test with both gpt-4o and gpt-4o-mini models.
-    Marks the gpt-4o-mini run as xfail since it may not handle complex instructions well.
-    """
-
-    @functools.wraps(test_func)
-    @pytest.mark.parametrize(
-        "llm_model,should_fail",
-        [
-            ("openai/gpt-4o-mini", True),
-            ("openai/gpt-4o", False),
-        ],
-    )
-    def wrapper(*args, llm_model, should_fail, **kwargs):
-        if should_fail:
-            pytest.xfail("Test requires GPT-4o's improved instruction following")
-        return test_func(*args, llm_model=llm_model, should_fail=should_fail, **kwargs)
-
-    return wrapper
 
 
 def test_bug_with_reproduction_steps():
@@ -117,8 +93,7 @@ def test_documentation_changes():
     assert "bug" not in result
 
 
-@requires_gpt4o
-def test_never_apply_label(llm_model, should_fail):
+def test_never_apply_label():
     labels = [
         Label(
             name="do-not-merge",
@@ -135,7 +110,7 @@ def test_never_apply_label(llm_model, should_fail):
         author="marvin",
     )
 
-    result = labeling_workflow(item=pr, labels=labels, llm_model=llm_model)
+    result = labeling_workflow(item=pr, labels=labels)
     assert "do-not-merge" not in result
 
 
@@ -218,8 +193,7 @@ def test_security_label_with_instructions():
     assert "security" in result
 
 
-@requires_gpt4o
-def test_complex_feature_pr(llm_model, should_fail):
+def test_complex_feature_pr():
     labels = [
         Label(name="enhancement", description="New feature or request"),
         Label(
@@ -292,7 +266,7 @@ def test_complex_feature_pr(llm_model, should_fail):
         author="marvin",
     )
 
-    result = labeling_workflow(item=pr, labels=labels, llm_model=llm_model)
+    result = labeling_workflow(item=pr, labels=labels)
 
     # Major feature addition
     assert "enhancement" in result
@@ -439,8 +413,7 @@ def test_security_review_routing():
     assert "high-priority" in result
 
 
-@requires_gpt4o
-def test_directory_based_labels(llm_model, should_fail):
+def test_directory_based_labels():
     labels = [
         Label(
             name="ci",
@@ -471,7 +444,7 @@ def test_directory_based_labels(llm_model, should_fail):
         author="marvin",
     )
 
-    result = labeling_workflow(item=pr, labels=labels, llm_model=llm_model)
+    result = labeling_workflow(item=pr, labels=labels)
     assert "ci" in result
     assert "tests" in result
     assert "config" in result
