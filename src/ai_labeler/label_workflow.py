@@ -25,6 +25,8 @@ def run_label_workflow_from_env() -> list[str]:
         github_workspace=os.getenv("GITHUB_WORKSPACE"),
         dry_run=os.getenv("INPUT_DRY-RUN", "false").lower() == "true",
         github_output=os.getenv("GITHUB_OUTPUT"),
+        include_repo_labels=os.getenv("INPUT_INCLUDE-REPO-LABELS", "true").lower()
+        == "true",
     )
 
 
@@ -37,6 +39,7 @@ def run_label_workflow(
     github_workspace: str | None = None,
     dry_run: bool = False,
     github_output: str | None = None,
+    include_repo_labels: bool = True,
 ) -> list[str]:
     """Main workflow function that accepts explicit configuration"""
 
@@ -56,7 +59,9 @@ def run_label_workflow(
 
     # Load config and get available labels
     config = Config.load(config_path=str(full_config_path))
-    available_labels = get_available_labels_from_config(gh, config)
+    available_labels = get_available_labels_from_config(
+        gh, config, include_repo_labels=include_repo_labels
+    )
 
     # Get the item to label
     issue = repo.get_issue(number)

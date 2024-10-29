@@ -44,10 +44,11 @@ def test_get_labels_basic_config(mock_github):
                 instructions="Apply for security fixes",
             ),
         ],
-        include_repo_labels=True,
     )
 
-    labels = get_available_labels_from_config(gh_client, config)
+    labels = get_available_labels_from_config(
+        gh_client, config, include_repo_labels=True
+    )
 
     # Should include both config and repo labels
     assert len(labels) == 4  # 3 repo labels + 1 new from config
@@ -73,10 +74,11 @@ def test_get_labels_config_only(mock_github):
             LabelConfig(name="frontend", description="Frontend changes"),
             LabelConfig(name="backend", description="Backend changes"),
         ],
-        include_repo_labels=False,
     )
 
-    labels = get_available_labels_from_config(gh_client, config)
+    labels = get_available_labels_from_config(
+        gh_client, config, include_repo_labels=False
+    )
 
     # Should only include config labels
     assert len(labels) == 2
@@ -103,10 +105,11 @@ def test_get_labels_with_instructions(mock_github):
                 instructions="Apply for new features",
             ),
         ],
-        include_repo_labels=True,
     )
 
-    labels = get_available_labels_from_config(gh_client, config)
+    labels = get_available_labels_from_config(
+        gh_client, config, include_repo_labels=True
+    )
 
     # Check instructions were added
     bug_label = next(l for l in labels if l.name == "bug")
@@ -123,10 +126,11 @@ def test_get_labels_empty_config(mock_github):
     config = Config(
         instructions="Use existing repo labels",
         labels=[],
-        include_repo_labels=True,
     )
 
-    labels = get_available_labels_from_config(gh_client, config)
+    labels = get_available_labels_from_config(
+        gh_client, config, include_repo_labels=True
+    )
 
     # Should return all repo labels unchanged
     assert len(labels) == 3
@@ -144,10 +148,11 @@ def test_get_labels_no_repo_labels(mock_github):
         labels=[
             LabelConfig(name="test", description="Test label"),
         ],
-        include_repo_labels=True,
     )
 
-    labels = get_available_labels_from_config(gh_client, config)
+    labels = get_available_labels_from_config(
+        gh_client, config, include_repo_labels=True
+    )
 
     assert len(labels) == 1
     assert labels[0].name == "test"
