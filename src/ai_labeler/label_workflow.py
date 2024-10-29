@@ -85,7 +85,7 @@ def run_label_workflow(
         item=item,
         labels=available_labels,
         instructions=config.instructions,
-        context_files=config.load_context_files(),
+        context_files=config.load_context_files(repo_root_path=github_workspace),
     )
 
     # Apply the labels
