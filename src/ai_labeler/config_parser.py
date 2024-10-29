@@ -1,23 +1,22 @@
+from typing import Optional
+from pydantic import BaseModel
 import yaml
 
 
-from dataclasses import dataclass
 from pathlib import Path
 
 
-@dataclass
-class LabelConfig:
+class LabelConfig(BaseModel):
     name: str
     description: str | None = None
     instructions: str | None = None
 
 
-@dataclass
-class Config:
-    instructions: str
-    include_repo_labels: bool
-    labels: list[LabelConfig]
-    context_files: list[str] = None
+class Config(BaseModel):
+    instructions: Optional[str] = None
+    include_repo_labels: bool = True
+    labels: list[LabelConfig] = []
+    context_files: list[str] = []
 
     @classmethod
     def load(cls, config_path: str) -> "Config":

@@ -1,0 +1,41 @@
+name: Run tests
+
+env:
+  # enable colored output
+  PY_COLORS: 1
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  run_tests:
+    name: Run tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: download uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Install AI Labeler
+        run: uv sync
+
+      - name: Run tests
+        run: pytest -vv
+        if: ${{ !(github.event.pull_request.head.repo.fork) }}

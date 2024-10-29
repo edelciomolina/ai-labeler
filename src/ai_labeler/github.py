@@ -43,7 +43,7 @@ def get_available_labels(gh_client: Github) -> list[Label]:
     result = [Label(name=label.name, description=label.description) for label in labels]
 
     _label_cache[repo_name] = result
-    return result
+    return result.copy()
 
 
 def apply_labels(gh_client: Github, labels: list[str], dry_run: bool = False) -> None:
@@ -119,10 +119,17 @@ def get_available_labels_from_config(
 
     # Enhance labels with config overrides
     config_map = {cfg.name: cfg for cfg in config.labels}
+
+    labels = []
     for label in repo_labels:
         if label.name in config_map:
             cfg = config_map[label.name]
-            label.description = cfg.description or label.description
-            label.instructions = cfg.instructions
+            # Create a new label instead of modifying in place
+            label = Label(
+                name=label.name,
+                description=cfg.description or label.description,
+                instructions=cfg.instructions,
+            )
+        labels.append(label)
 
-    return repo_labels
+    return labels
