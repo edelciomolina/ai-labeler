@@ -34,7 +34,7 @@ jobs:
         run: curl -LsSf https://astral.sh/uv/install.sh | sh
 
       - name: Install AI Labeler
-        run: uv --system pip install -e ".[dev]"
+        run: uv pip install -e ".[dev]" --system
 
       - name: Run tests
         run: pytest -vv
