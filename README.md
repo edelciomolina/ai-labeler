@@ -58,7 +58,7 @@ You must specify an LLM provider and provide an API key. You can use either Open
 
 #### LLM Model
 
-By default, the AI labeler uses OpenAI's `gpt-4o-mini` model. You can specify a different model if you'd like:
+By default, the AI labeler uses OpenAI's `gpt-4o-mini` model. This is an excellent and affordable choice for most users. However, 4o-mini can get confused by complex per-label instructions. You can specify a different model if you'd like:
 
 ```yaml
 - uses: jlowin/ai-labeler@v0.2.1

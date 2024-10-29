@@ -1,18 +1,15 @@
 import os
 import json
+from typing import Optional
 from github import Github
 from pydantic import BaseModel
-from dataclasses import dataclass
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from .ai import Config
+from .config_parser import Config
 
 
 class PullRequest(BaseModel):
     title: str
     body: str
-    changed_files: list[dict[str, str]]
+    files: dict[str, str]
     author: str  # GitHub username
 
 
@@ -22,11 +19,10 @@ class Issue(BaseModel):
     author: str  # GitHub username
 
 
-@dataclass
-class Label:
+class Label(BaseModel):
     name: str
-    description: str = ""
-    instructions: str | None = None
+    description: Optional[str] = None
+    instructions: Optional[str] = None
 
 
 # Simple cache to store labels per repository
@@ -47,16 +43,16 @@ def get_available_labels(gh_client: Github) -> list[Label]:
     result = [Label(name=label.name, description=label.description) for label in labels]
 
     _label_cache[repo_name] = result
-    return result
+    return result.copy()
 
 
-def apply_labels(gh_client: Github, labels: list[str]) -> None:
+def apply_labels(gh_client: Github, labels: list[str], dry_run: bool = False) -> None:
     """Apply the chosen labels to the PR/issue"""
     repo = gh_client.get_repo(os.getenv("GITHUB_REPOSITORY"))
     number = get_event_number()
 
     # If dry-run is enabled, just print the labels that would be applied
-    if os.getenv("INPUT_DRY-RUN", "false").lower() == "true":
+    if dry_run:
         print(f"Dry run: Would apply labels {labels} to #{number}")
         return
 
@@ -123,10 +119,17 @@ def get_available_labels_from_config(
 
     # Enhance labels with config overrides
     config_map = {cfg.name: cfg for cfg in config.labels}
+
+    labels = []
     for label in repo_labels:
         if label.name in config_map:
             cfg = config_map[label.name]
-            label.description = cfg.description or label.description
-            label.instructions = cfg.instructions
+            # Create a new label instead of modifying in place
+            label = Label(
+                name=label.name,
+                description=cfg.description or label.description,
+                instructions=cfg.instructions,
+            )
+        labels.append(label)
 
-    return repo_labels
+    return labels
