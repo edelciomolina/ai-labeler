@@ -210,7 +210,7 @@ def test_complex_feature_pr():
         Label(
             name="performance",
             description="Performance improvements",
-            instructions="Apply when changes are primarily focused on improving performance",
+            instructions="Apply when changes are reported to drive significant performance gains",
         ),
     ]
 
