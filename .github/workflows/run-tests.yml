@@ -37,5 +37,5 @@ jobs:
         run: uv pip install -e ".[dev]" --system
 
       - name: Run tests
-        run: pytest -vv
+        run: pytest -n auto -vv -s
         if: ${{ !(github.event.pull_request.head.repo.fork) }}
