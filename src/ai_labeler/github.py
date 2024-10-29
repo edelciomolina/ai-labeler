@@ -1,8 +1,8 @@
 import os
 import json
+from typing import Optional
 from github import Github
 from pydantic import BaseModel
-from dataclasses import dataclass
 from .config_parser import Config
 
 
@@ -19,11 +19,10 @@ class Issue(BaseModel):
     author: str  # GitHub username
 
 
-@dataclass
-class Label:
+class Label(BaseModel):
     name: str
-    description: str = ""
-    instructions: str | None = None
+    description: Optional[str] = None
+    instructions: Optional[str] = None
 
 
 # Simple cache to store labels per repository

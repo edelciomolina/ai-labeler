@@ -1,6 +1,7 @@
-from enum import Enum
 import controlflow as cf
 from typing import Optional, Union
+
+from pydantic import BaseModel, Field
 from .github import PullRequest, Issue, Label
 
 
@@ -12,27 +13,17 @@ def labeling_workflow(
     context_files: Optional[dict[str, str]] = None,
     llm_model: Optional[str] = None,
 ) -> list[str]:
-    # Load configuration and context files
-
-    LabelChoice = Enum(
-        "LabelChoice", {label.name: label.name for label in labels}, type=str
-    )
+    class Decision(BaseModel):
+        # without reasoning, gpt-4o-mini sometimes ignores label instructions
+        reasoning: str = Field(description="A few sentences explaining your decision.")
+        label_indices: list[int]
 
     # Create an agent specialized in GitHub labeling
     labeler = cf.Agent(
         name="GitHub Labeler",
-        instructions=f"""
-        You are an expert at categorizing GitHub issues and pull requests.
-        
-        Be conservative - only assign labels when you're confident they apply.
-        
-        Your context includes a description of the issue or PR, as well as all
-        available labels and any additional description or instructions, and
-        also any other files from the repo that may be relevant to your task.
-        
-        Additional instructions:
-        
-        {instructions or 'None.'}
+        instructions="""
+        You are an expert AI that automatically labelling GitHub issues and pull
+        requests. You always pay close attention to label instructions.
         """,
         model=llm_model or "openai/gpt-4o-mini",
     )
@@ -40,20 +31,20 @@ def labeling_workflow(
     # Task to analyze and choose labels
     decision = cf.run(
         """
-        Analyze the PR/issue carefully and assign appropriate labels from the
-        available set. You may assign any number of labels, including no labels.
-        You should do your best to assign labels based on what would be most
-        helpful to the repo maintainers, taking the label descriptions into
-        account as well as any additional instructions.
+        Select labels for the provided PR/issue. Consider all available context, including description and files. Choose the index of the most
+        appropriate labels; you may assign any number of labels or none at all.
+        
+        You MUST read label instructions carefully to see if they are appropriate for this PR/issue.
         """,
-        result_type=list[LabelChoice],
+        instructions=instructions,
+        result_type=Decision,
         context={
-            "pr_or_issue": item,
-            "all_labels": labels,
-            "context_files": context_files,
+            "pr_or_issue_to_label": item,
+            "available_labels": dict(enumerate(labels)),
+            "additional_context": context_files,
         },
         agents=[labeler],
         model_kwargs=dict(tool_choice="required"),
     )
 
-    return [label.value for label in decision]
+    return [labels[i].name for i in decision.label_indices]
