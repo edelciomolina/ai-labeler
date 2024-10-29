@@ -1,0 +1,7 @@
+labels:
+  - bug:
+    description: "Something isn't working"
+  - enhancement:
+    description: "New feature or request"
+  - question:
+    description: "Contains a question"

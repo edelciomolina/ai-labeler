@@ -45,6 +45,9 @@ def labeling_workflow(
         },
         agents=[labeler],
         model_kwargs=dict(tool_choice="required"),
+        handlers=[],
     )
+
+    print(decision.model_dump_json(indent=2))
 
     return [labels[i].name for i in decision.label_indices]
