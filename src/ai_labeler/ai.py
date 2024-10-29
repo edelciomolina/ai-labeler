@@ -15,7 +15,7 @@ def labeling_workflow(
 ) -> list[str]:
     class Decision(BaseModel):
         reasoning: str
-        applied_labels: list[str]
+        labels: list[str]
 
         def validate_labels(cls, v):
             if any(label not in [l.name for l in labels] for label in v):
@@ -58,17 +58,17 @@ def labeling_workflow(
         
         - Label <name>: 
             
-            -- <are there any instructions that apply to this label's
+            1. <are there any instructions that apply to this label's
             applicability other than explaining its meaning?> 
             
-            -- <reason about the label's applicability: do any instructions
+            2. <reason about the label's applicability: do any instructions
             apply that would affect your decision?> 
             
-            -- Apply label to PR/issue: <decision yes / no>
+            3. Apply label to PR/issue: <decision yes / no>
           
         - Label 2: 
         
-            -- ...
+            1. ...
             
         """,
         instructions=instructions,
@@ -85,6 +85,6 @@ def labeling_workflow(
 
     print(f"Available labels: {dict(enumerate(labels))}")
     print(f"\n\nReasoning: {decision.reasoning}")
-    print(f"\n\nApplied labels: {decision.applied_labels}")
+    print(f"\n\nApplied labels: {decision.labels}")
 
-    return decision.applied_labels
+    return decision.labels
