@@ -37,7 +37,8 @@ def labeling_workflow(
     decision = cf.run(
         """
         Consider the provided PR/issue and its context. Examine each available
-        label carefully. 
+        label carefully. Your job is to label the PR/issue as accurately as
+        possible.
         
         Each label has a name and optional description and instructions. Treat
         all three as instructions for understanding whether the label is

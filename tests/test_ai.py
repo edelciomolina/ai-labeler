@@ -418,17 +418,17 @@ def test_directory_based_labels():
         Label(
             name="ci",
             description="CI/CD changes",
-            instructions="Apply to changes in .github/workflows, .circleci, or similar CI directories",
+            instructions="Apply when there arechanges in .github/workflows, .circleci, or similar CI directories",
         ),
         Label(
             name="tests",
             description="Test updates",
-            instructions="Apply when changes are primarily in test files or test directories",
+            instructions="Apply when there are changes primarily in test files or test directories",
         ),
         Label(
             name="config",
             description="Configuration changes",
-            instructions="Apply to changes in config files or .github directory",
+            instructions="Apply when there are changes in config files or the .github directory",
         ),
     ]
 
