@@ -17,7 +17,7 @@ jobs:
   run_tests:
     name: Run tests
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 5
 
     env:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -37,5 +37,5 @@ jobs:
         run: uv pip install -e ".[dev]" --system
 
       - name: Run tests
-        run: pytest -vv
+        run: pytest -n auto -vv -s
         if: ${{ !(github.event.pull_request.head.repo.fork) }}
