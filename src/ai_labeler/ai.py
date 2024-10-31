@@ -13,16 +13,12 @@ def labeling_workflow(
     context_files: Optional[dict[str, str]] = None,
     llm_model: Optional[str] = None,
 ) -> list[str]:
-    class Decision(BaseModel):
-        reasoning: str
-        labels: list[str]
-
-        def validate_labels(cls, v):
-            if any(label not in [l.name for l in labels] for label in v):
-                raise ValueError(
-                    f"Invalid labels. Must be one of {', '.join(f"{l.name}" for l in labels)}"
-                )
-            return v
+    def validate_labels(result: list[str]):
+        if any(label not in [l.name for l in labels] for label in result):
+            raise ValueError(
+                f"Invalid labels. Must be one of {', '.join(f"{l.name}" for l in labels)}"
+            )
+        return result
 
     # Create an agent specialized in GitHub labeling
     labeler = cf.Agent(
@@ -34,58 +30,56 @@ def labeling_workflow(
         model=llm_model or "openai/gpt-4o-mini",
     )
 
-    decision = cf.run(
+    class Reasoning(BaseModel):
+        label_name: str
+        reasoning: str
+
+    reasoning = cf.run(
         """
-        Consider the provided PR/issue and its context. Examine each available
-        label carefully. Your job is to label the PR/issue as accurately as
-        possible.
-        
-        Each label has a name and optional description and instructions. Treat
-        all three as instructions for understanding whether the label is
-        relevant.
-        
-        For labels that seem appropriate, provide a complete rationale of
+        Consider the provided PR/issue, its context, and any provided
+        instructions. Examine each available label carefully. Your job is to
+        choose which labels to apply to the PR/issue.
+
+        Each label has a name, optional description, and optional instructions.
+        Treat all three as inputs for understanding whether the label is
+        relevant. Evaluate each label independently.
+
+        For labels that may be appropriate, provide a complete rationale of
         whether you would assign them to the PR/issue, taking your instructions
         and the label's instructions into account. Some labels will have
         specific instructions about when to apply them, or whether to apply them
-        at all. These instructions take precedence over the label's inherent
-        relevance. Be sure to reference all relevant context and instructions in
-        your reasoning.
-        
-        You may select any number of labels or none at all. You do not need to
-        reason about labels that are obviously irrelevant.
-        
-        Example reasoning format:
-        
-        - Label <name>: 
-            
-            1. <are there any instructions that apply to this label's
-            applicability other than explaining its meaning?> 
-            
-            2. <reason about the label's applicability: do any instructions
-            apply that would affect your decision?> 
-            
-            3. Apply label to PR/issue: <decision yes / no>
-          
-        - Label 2: 
-        
-            1. ...
-            
+        at all. Be sure to reference all relevant context and instructions in
+        your reasoning. You do not need to reason about labels that are
+        obviously irrelevant.
         """,
         instructions=instructions,
-        result_type=Decision,
+        result_type=list[Reasoning],
         context={
             "pr_or_issue_to_label": item,
             "available_labels": dict(enumerate(labels)),
             "additional_context": context_files,
+            "labeling_instructions": instructions,
         },
         agents=[labeler],
         completion_tools=["SUCCEED"],  # the task can not be marked as failed
         model_kwargs=dict(tool_choice="required"),  # prevent chatting
     )
 
-    print(f"Available labels: {dict(enumerate(labels))}")
-    print(f"\n\nReasoning: {decision.reasoning}")
-    print(f"\n\nApplied labels: {decision.labels}")
+    decision = cf.run(
+        """
+        Based on the reasoning for each label, return the list of labels that
+        should be applied. If no labels apply, return an empty list.
+        """,
+        result_type=list[str],
+        result_validator=validate_labels,
+        context={"reasoning": reasoning, "available_labels": labels},
+        agents=[labeler],
+        completion_tools=["SUCCEED"],  # the task can not be marked as failed
+        model_kwargs=dict(tool_choice="required"),  # prevent chatting
+    )
 
-    return decision.labels
+    print(f"Available labels: {dict(enumerate(labels))}")
+    print(f"\n\nReasoning: {reasoning}")
+    print(f"\n\nApplied labels: {decision}")
+
+    return decision
