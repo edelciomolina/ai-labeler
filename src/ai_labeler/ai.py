@@ -32,7 +32,8 @@ def labeling_workflow(
 
     class Reasoning(BaseModel):
         label_name: str
-        reasoning: str
+        # reasoning: str
+        should_apply: bool
 
     reasoning = cf.run(
         """
@@ -49,8 +50,10 @@ def labeling_workflow(
         and the label's instructions into account. Some labels will have
         specific instructions about when to apply them, or whether to apply them
         at all. Be sure to reference all relevant context and instructions in
-        your reasoning. You do not need to reason about labels that are
-        obviously irrelevant.
+        your reasoning. 
+        
+        You do not need to return reasoning about labels that are obviously
+        irrelevant.
         """,
         instructions=instructions,
         result_type=list[Reasoning],
@@ -65,18 +68,23 @@ def labeling_workflow(
         model_kwargs=dict(tool_choice="required"),  # prevent chatting
     )
 
-    decision = cf.run(
-        """
-        Based on the reasoning for each label, return the list of labels that
-        should be applied. If no labels apply, return an empty list.
-        """,
-        result_type=list[str],
-        result_validator=validate_labels,
-        context={"reasoning": reasoning, "available_labels": labels},
-        agents=[labeler],
-        completion_tools=["SUCCEED"],  # the task can not be marked as failed
-        model_kwargs=dict(tool_choice="required"),  # prevent chatting
-    )
+    decision = [r.label_name for r in reasoning if r.should_apply]
+
+    # --- old two-step approach. Adding `should_apply` to the reasoning model
+    # appears to match performance in a single step.
+    #
+    # decision = cf.run(
+    #     """
+    #     Based on the reasoning for each label, return the list of labels that
+    #     should be applied. If no labels apply, return an empty list.
+    #     """,
+    #     result_type=list[str],
+    #     result_validator=validate_labels,
+    #     context={"reasoning": reasoning, "available_labels": labels},
+    #     agents=[labeler],
+    #     completion_tools=["SUCCEED"],  # the task can not be marked as failed
+    #     model_kwargs=dict(tool_choice="required"),  # prevent chatting
+    # )
 
     print(f"Available labels: {dict(enumerate(labels))}")
     print(f"\n\nReasoning: {reasoning}")
