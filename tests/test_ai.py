@@ -5,6 +5,23 @@ from ai_labeler.github import PullRequest, Issue, Label
 
 @flaky(max_runs=3)
 class TestLabelingWorkflow:
+    def test_no_labels_provided(self):
+        """Test that when no labels are provided, no labels are assigned"""
+
+        pr = PullRequest(
+            title="Update database connection handling",
+            body="Improved connection pooling and timeout handling",
+            files={
+                "src/database.py": "def connect_db(): pass",
+                "tests/test_database.py": "def test_connect_db(): pass",
+            },
+            author="marvin",
+        )
+
+        # Pass an empty list of labels
+        result = labeling_workflow(item=pr, labels=[])
+        assert result == []
+
     def test_bug_with_reproduction_steps(self):
         labels = [
             Label(
