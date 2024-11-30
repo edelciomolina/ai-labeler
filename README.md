@@ -44,6 +44,13 @@ jobs:
 ```
 1. Add an OpenAI API key to your repository's secrets as `OPENAI_API_KEY`.
 
+1. Optionally, add a fine-tuning configuration file to `.github/ai-labeler.yml`. This example will add the contents of `README.md` and `CONTRIBUTING.md` to the LLM's context when labeling issues and PRs.
+```yaml
+context-files:
+  - README.md
+  - CONTRIBUTING.md
+```
+
 That's it! 
 
 Whenever an issue or PR is opened, the action will read your repository's existing labels and their descriptions to make smart labeling decisions. To improve its accuracy, update your label descriptions in GitHub's UI or provide a fine-tuning configuration file as described below.
@@ -136,7 +143,7 @@ instructions: |
   "..."
 labels:
   - ...
-context_files:
+context-files:
   - ...
 ```
 
@@ -175,7 +182,7 @@ labels:
 By default, the LLM context includes a variety of information about the issue or PR in question, as well as information about available labels. You can specify additional files the AI should consider when making decisions:
 
 ```yaml
-context_files:
+context-files:
   - .github/CODEOWNERS
   - CONTRIBUTING.md
   - .github/ISSUE_TEMPLATE/bug_report.md
@@ -222,7 +229,7 @@ labels:
       - Check CODEOWNERS for @backend-team ownership
       - Look for database or API changes
 
-context_files:
+context-files:
   - .github/CODEOWNERS
 ```
 
@@ -275,10 +282,11 @@ labels:
       - Minimal prerequisite knowledge
       - Good documentation exists
 
-context_files:
+context-files:
   - .github/ISSUE_TEMPLATE/bug_report.md
   - CONTRIBUTING.md
 ```
+
 ### Size-based Labeling
 
 Global instructions for labeling PRs based on the number of lines changed:
@@ -302,7 +310,6 @@ instructions: |
 
 Based on the contents of the PR, the AI can apply a `security-review` label and mark the issue as high priority.
 
-
 ```yaml
 instructions: |
   Apply 'security-review' label if the changes involve:
@@ -318,7 +325,7 @@ instructions: |
   - security/*
   - crypto/*
 
-context_files:
+context-files:
   - .github/SECURITY.md
   - .github/CODEOWNERS
 ```
@@ -382,7 +389,7 @@ labels:
       
       When this label is applied, include a comment explaining why and link to contributing guidelines.
 
-context_files:
+context-files:
   - .github/pull_request_template.md
   - CONTRIBUTING.md
   - CODE_OF_CONDUCT.md

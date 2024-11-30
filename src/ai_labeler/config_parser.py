@@ -44,10 +44,13 @@ class Config(BaseModel):
                         )
                     )
 
+            # Support both context-files and context_files (for backwards compatibility)
+            context_files = data.get("context-files", data.get("context_files", []))
+
             return cls(
                 instructions=data.get("instructions", ""),
                 labels=label_configs,
-                context_files=data.get("context_files", []),
+                context_files=context_files,
             )
         except FileNotFoundError:
             # If no config file exists, return default config
