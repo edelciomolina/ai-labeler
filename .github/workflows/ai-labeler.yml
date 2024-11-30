@@ -2,11 +2,9 @@ name: AI Labeler
 
 on:
   issues:
-    types: [opened, reopened]
-  issue_comment:
-    types: [created]
+    types: [opened]
   pull_request:
-    types: [opened, reopened]
+    types: [opened]
 
 jobs:
   ai-labeler:

@@ -24,9 +24,9 @@ name: AI Labeler
 
 on:
   issues:
-    types: [opened, reopened]
+    types: [opened]
   pull_request:
-    types: [opened, reopened]
+    types: [opened]
 
 jobs:
   ai-labeler:
