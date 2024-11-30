@@ -126,7 +126,7 @@ class TestLabelingWorkflow:
             author="marvin",
         )
 
-        result = labeling_workflow(item=pr, labels=labels)
+        result = labeling_workflow(item=pr, labels=labels, llm_model="openai/gpt-4o")
         assert "do-not-merge" not in result
 
     def test_feature_request(self):

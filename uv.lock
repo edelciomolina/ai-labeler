@@ -28,9 +28,9 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "controlflow", specifier = ">=0.11.1" },
+    { name = "controlflow", specifier = ">=0.11.4" },
     { name = "copychat", marker = "extra == 'dev'", specifier = ">=0.1.0" },
-    { name = "flaky" },
+    { name = "flaky", specifier = ">=3.8.1" },
     { name = "pygithub", specifier = ">=2.4.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.3.3" },
     { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = ">=0.24.0" },
@@ -314,7 +314,7 @@ wheels = [
 
 [[package]]
 name = "controlflow"
-version = "0.11.1"
+version = "0.11.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ipython" },
@@ -330,9 +330,9 @@ dependencies = [
     { name = "tiktoken" },
     { name = "typer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/85/6d/65a5b84d7fa7c317b3776238d38373a462a1105422931bee3c0b14b606fb/controlflow-0.11.1.tar.gz", hash = "sha256:2746422c9ddfb60c53db93f94eead2aca7670131a40d9546125a3d0868365c83", size = 1648915 }
+sdist = { url = "https://files.pythonhosted.org/packages/a9/49/ad9abd0d9afdb4b46f13fb3eaeaaae7b1560ec84facbfce44ebce7c7366f/controlflow-0.11.4.tar.gz", hash = "sha256:01ba330a4f6cf3cbd04f85c28e2f4d8a67888f56d57a6be386d05dc73507e8bb", size = 1649413 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/bb/fe/0976a7ba832cea3c57a9d03ebeb853083c02e357d74ca316f1ff3432936a/controlflow-0.11.1-py3-none-any.whl", hash = "sha256:b9f4f44f4883748d4a35aa44ece85346cc484111f116300518d5f705fd77b350", size = 91624 },
+    { url = "https://files.pythonhosted.org/packages/87/07/7c3c2e00082cc41850766ea3061b7ebac9d09857e6f1f128cb762c37d7be/controlflow-0.11.4-py3-none-any.whl", hash = "sha256:0bc5e8e7d6bdba2e693041d5b55af612d29a8c009f120f24faf4e562d5064eb2", size = 92219 },
 ]
 
 [[package]]
@@ -1122,7 +1122,7 @@ wheels = [
 
 [[package]]
 name = "openai"
-version = "1.46.1"
+version = "1.55.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
@@ -1134,9 +1134,9 @@ dependencies = [
     { name = "tqdm" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/fc/6b/470673304605c4aa4ee899dbab6ea12f6a0844e3ee7970ce7ecae0c89aea/openai-1.46.1.tar.gz", hash = "sha256:e5cf7f268bf516de23686d496c9dae7f0dcdcd0e87af4d288deeab8329fcbbaf", size = 297547 }
+sdist = { url = "https://files.pythonhosted.org/packages/1e/39/d4859d897da053b61b84403f67dbef1abd075e441cb354892ff14f98e2c7/openai-1.55.3.tar.gz", hash = "sha256:547e85b94535469f137a779d8770c8c5adebd507c2cc6340ca401a7c4d5d16f0", size = 314571 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/da/14/aabc614d8c446cb32043ed397dd8536a8f4c43a92c6609c05a958be9b960/openai-1.46.1-py3-none-any.whl", hash = "sha256:7517f07117cf66012bbc55c49fd6b983eaac0f3d2a09c90cba1140d4455e4290", size = 375150 },
+    { url = "https://files.pythonhosted.org/packages/10/06/691ef3f0112ecf0d7420d0bf35b5d16cf81554141f4b4913a9831031013d/openai-1.55.3-py3-none-any.whl", hash = "sha256:2a235d0e1e312cd982f561b18c27692e253852f4e5fb6ccf08cb13540a9bdaa1", size = 389558 },
 ]
 
 [[package]]

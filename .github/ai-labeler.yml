@@ -5,3 +5,7 @@ labels:
     description: "New feature or request"
   - question:
     description: "Contains a question"
+
+context-files:
+  - README.md
+  - CONTRIBUTING.md
