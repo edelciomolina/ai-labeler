@@ -37,7 +37,7 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@v4
-      - uses: jlowin/ai-labeler@v0.4.0
+      - uses: jlowin/ai-labeler@v0.5.0
         with:
           include-repo-labels: true
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
@@ -66,7 +66,7 @@ By default, the AI labeler will use all labels found in your repository, as well
 To disable this behavior, set `include-repo-labels` to `false`. In this case, the AI will only use labels defined in your config file. See the fine-tuning section below for more details.
 
 ```yaml
-- uses: jlowin/ai-labeler@v0.4.0
+- uses: jlowin/ai-labeler@v0.5.0
   with:
     include-repo-labels: false  # Only use labels defined in config
 ```
@@ -81,7 +81,7 @@ You must specify an LLM provider and provide an API key. You can use either Open
 By default, the AI labeler uses OpenAI's `gpt-4o-mini` model. This is an excellent and affordable choice for most users. However, 4o-mini can get confused by complex per-label instructions. You can specify a different model if you'd like:
 
 ```yaml
-- uses: jlowin/ai-labeler@v0.4.0
+- uses: jlowin/ai-labeler@v0.5.0
   with:
     controlflow-llm-model: openai/gpt-4o-mini
 ```
@@ -97,7 +97,7 @@ Note that you must provide an appropriate API key for your selected LLM provider
 #### OpenAI
 
 ```yaml
-- uses: jlowin/ai-labeler@v0.4.0
+- uses: jlowin/ai-labeler@v0.5.0
   with:
     openai-api-key: ${{ secrets.OPENAI_API_KEY }}
     
@@ -110,7 +110,7 @@ Set your OpenAI API key as a repository secret named `OPENAI_API_KEY`. Since the
 #### Anthropic
 
 ```yaml
-- uses: jlowin/ai-labeler@v0.4.0
+- uses: jlowin/ai-labeler@v0.5.0
   with:
     anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
 
@@ -125,7 +125,7 @@ Set your Anthropic API key as a repository secret named `ANTHROPIC_API_KEY`. To 
 By default, the action looks for additional configuration in `.github/ai-labeler.yml`. You can specify a different location:
 
 ```yaml
-- uses: jlowin/ai-labeler@v0.4.0
+- uses: jlowin/ai-labeler@v0.5.0
   with:
     config-path: .github/my-custom-config.yml
 ```
