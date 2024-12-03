@@ -39,12 +39,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: jlowin/ai-labeler@v0.5.0
         with:
-          include-repo-labels: true
+          include-repo-labels: true  # Set to false if you're providing a config file with labels
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
 ```
 1. Add an OpenAI API key to your repository's secrets as `OPENAI_API_KEY`.
 
-1. Optionally, add a fine-tuning configuration file to `.github/ai-labeler.yml`. This example will add the contents of `README.md` and `CONTRIBUTING.md` to the LLM's context when labeling issues and PRs.
+1. Optionally, add a fine-tuning configuration file to `.github/ai-labeler.yml`. This example will add the contents of `README.md` and `CONTRIBUTING.md` to the LLM's context when labeling issues and PRs. (See [below](#example-configuration) for a more comprehensive example.)
+
 ```yaml
 context-files:
   - README.md
@@ -145,6 +146,101 @@ labels:
   - ...
 context-files:
   - ...
+```
+
+### Example Configuration
+
+This example provides a focused set of default labels with clear instructions for minimal, accurate labeling. For best results, turn off the `include-repo-labels` option. This will require the AI to use only the labels defined in your config file.
+
+```yaml
+instructions: |
+  Apply the minimal set of labels that accurately characterize the issue/PR:
+  - Use at most 1-2 labels unless there's a compelling reason for more
+  - Prefer specific labels (bug, feature) over generic ones (question, help wanted)
+  - For PRs that fix bugs, use 'bug' not 'enhancement'
+  - Never combine: bug + enhancement, feature + enhancement. For these labels, only choose the most relevant one.
+  - Reserve 'question' and 'help wanted' for when they're the primary characteristic
+
+labels:
+  - bug:
+    description: "Something isn't working as expected"
+    instructions: |
+      Apply when describing or fixing unexpected behavior:
+      - Issues: Clear error messages or unexpected outcomes
+      - PRs: Fixes for broken functionality
+      Don't apply enhancement/feature for bug fixes unless they add significant new functionality
+      beyond fixing the bug
+
+  - documentation:
+    description: "Improvements or additions to documentation"
+    instructions: |
+      Apply only when documentation is the primary focus:
+      - README updates
+      - Code comments and docstrings
+      - API documentation
+      - Usage examples
+      Don't apply for minor doc updates alongside code changes
+
+  - enhancement:
+    description: "Improvements to existing features"
+    instructions: |
+      Apply only for improvements to existing functionality:
+      - Performance improvements
+      - UI/UX improvements
+      - Expanded capabilities of existing features
+      Don't apply to:
+      - Bug fixes
+      - New features
+      - Minor tweaks
+
+  - feature:
+    description: "New functionality"
+    instructions: |
+      Apply only for net-new functionality:
+      - New API endpoints
+      - New commands or tools
+      - New user-facing capabilities
+      Don't apply to:
+      - Improvements to existing features (use enhancement)
+      - Bug fixes
+
+  - good first issue:
+    description: "Good for newcomers"
+    instructions: |
+      Apply very selectively to issues that are:
+      - Small in scope
+      - Well-documented
+      - Require minimal context
+      - Have clear success criteria
+      Don't apply if the task requires significant background knowledge
+
+  - help wanted:
+    description: "Extra attention is needed"
+    instructions: |
+      Apply only when it's the primary characteristic:
+      - Issue needs external expertise
+      - Current maintainers can't address it
+      - Additional contributors would be valuable
+      Don't apply just because an issue is open or needs work
+
+  - question:
+    description: "Further information is requested"
+    instructions: |
+      Apply only when the primary purpose is seeking information:
+      - Clarification needed before work can begin
+      - Architectural discussions
+      - Implementation strategy questions
+      Don't apply to:
+      - Bug reports that need more details
+      - Feature requests that need refinement
+
+# These files will be included in the context if they exist
+context-files:
+  - README.md
+  - CONTRIBUTING.md
+  - CODE_OF_CONDUCT.md
+  - .github/ISSUE_TEMPLATE/bug_report.md
+  - .github/ISSUE_TEMPLATE/feature_request.md
 ```
 
 ### Instructions
@@ -394,6 +490,7 @@ context-files:
   - CONTRIBUTING.md
   - CODE_OF_CONDUCT.md
 ```
+
 
 ## 💸 Cost
 
