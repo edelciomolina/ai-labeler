@@ -9,6 +9,8 @@ from ai_labeler.github import (
     PullRequest,
     Issue,
     get_event_number,
+    parse_github_links,
+    fetch_linked_items,
 )
 from ai_labeler.ai import labeling_workflow
 
@@ -67,17 +69,28 @@ def run_label_workflow(
     issue = repo.get_issue(number)
     if issue.pull_request:
         pr = repo.get_pull(number)
+
+        # Parse and fetch linked items
+        linked_numbers = parse_github_links(pr.body or "")
+        linked_items = fetch_linked_items(gh, linked_numbers)
+
         item = PullRequest(
             title=pr.title,
             body=pr.body or "",
             files={f.filename: f.patch for f in pr.get_files()},
             author=pr.user.login,
+            linked_items=linked_items,
         )
     else:
+        # Parse and fetch linked items
+        linked_numbers = parse_github_links(issue.body or "")
+        linked_items = fetch_linked_items(gh, linked_numbers)
+
         item = Issue(
             title=issue.title,
             body=issue.body or "",
             author=issue.user.login,
+            linked_items=linked_items,
         )
 
     # Run the labeling workflow

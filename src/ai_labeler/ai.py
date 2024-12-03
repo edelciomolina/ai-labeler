@@ -32,8 +32,19 @@ def labeling_workflow(
 
     class Reasoning(BaseModel):
         label_name: str
-        # reasoning: str
         should_apply: bool
+
+    # Format linked items for context
+    linked_items_context = ""
+    if item.linked_items:
+        linked_items_context = "\nLinked Items:\n"
+        for linked in item.linked_items:
+            linked_items_context += f"""
+            {linked.type.replace('_', ' ').title()} #{linked.number}:
+            Title: {linked.title}
+            Labels: {', '.join(linked.labels)}
+            Body: {linked.body}
+            """
 
     reasoning = cf.run(
         """
@@ -54,6 +65,11 @@ def labeling_workflow(
         
         You do not need to return reasoning about labels that are obviously
         irrelevant.
+
+        When evaluating labels, consider any linked items and their context:
+        - Look for patterns or relationships between the current item and linked items
+        - Consider if linked items provide additional context about the scope or impact
+        - Check if linked items have relevant labels that could inform this decision
         """,
         instructions=instructions,
         result_type=list[Reasoning],
@@ -62,6 +78,7 @@ def labeling_workflow(
             "available_labels": dict(enumerate(labels)),
             "additional_context": context_files,
             "labeling_instructions": instructions,
+            "linked_items_context": linked_items_context,
         },
         agents=[labeler],
         completion_tools=["SUCCEED"],  # the task can not be marked as failed

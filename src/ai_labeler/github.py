@@ -1,9 +1,20 @@
 import os
 import json
-from typing import Optional
+import re
+from typing import Optional, List
 from github import Github
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from .config_parser import Config
+
+
+class LinkedItem(BaseModel):
+    """Represents a linked GitHub issue or PR"""
+
+    number: int
+    title: str
+    body: str
+    labels: List[str]
+    type: str = Field(..., pattern="^(issue|pull_request)$")
 
 
 class PullRequest(BaseModel):
@@ -11,12 +22,14 @@ class PullRequest(BaseModel):
     body: str
     files: dict[str, str | None]
     author: str  # GitHub username
+    linked_items: List[LinkedItem] = Field(default_factory=list)
 
 
 class Issue(BaseModel):
     title: str
     body: str
     author: str  # GitHub username
+    linked_items: List[LinkedItem] = Field(default_factory=list)
 
 
 class Label(BaseModel):
@@ -135,3 +148,48 @@ def get_available_labels_from_config(
         labels.append(label)
 
     return labels
+
+
+def parse_github_links(text: str) -> List[int]:
+    """Extract GitHub issue/PR numbers from text using common formats:
+    - #123
+    - repo#123
+    - org/repo#123
+    """
+    # Match #123 format
+    numbers = set()
+
+    # Basic #123 format
+    matches = re.finditer(r"(?:^|\s)#(\d+)(?:\s|$)", text)
+    numbers.update(int(m.group(1)) for m in matches)
+
+    # org/repo#123 or repo#123 format (only care about numbers in current repo)
+    matches = re.finditer(r"(?:[\w-]+/)?[\w-]+#(\d+)", text)
+    numbers.update(int(m.group(1)) for m in matches)
+
+    return sorted(numbers)
+
+
+def fetch_linked_items(gh_client: Github, numbers: List[int]) -> List[LinkedItem]:
+    """Fetch full context of linked issues/PRs"""
+    repo = gh_client.get_repo(os.getenv("GITHUB_REPOSITORY"))
+    linked_items = []
+
+    for number in numbers:
+        try:
+            issue = repo.get_issue(number)
+            item_type = "pull_request" if issue.pull_request else "issue"
+
+            linked_items.append(
+                LinkedItem(
+                    number=number,
+                    title=issue.title,
+                    body=issue.body or "",
+                    labels=[label.name for label in issue.labels],
+                    type=item_type,
+                )
+            )
+        except Exception as e:
+            print(f"Warning: Failed to fetch item #{number}: {e}")
+
+    return linked_items
